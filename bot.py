@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
-from parser import parse_message
+from parser_1 import parse_message
 from create_row_log import create_row_log
 from create_row_shisha import create_row_shisha
 from create_row_gastro import create_row_gastro

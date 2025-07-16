@@ -19,7 +19,7 @@ async def parse_message(text, update):
 
     # теперь адрес
     address = next_non_empty()
-    #print(address)
+    # print(address)
 
     # товары
     total = 0
@@ -40,20 +40,19 @@ async def parse_message(text, update):
             })
             total += price
 
-
     if summa != total+delivery:
         await update.message.reply_text(f"Доставка в накладных расходах")
 
     await update.message.reply_text(
-        f"Клиент: {username}\n"
-        f"Оплата: {payment}\n"
-        f"Сумма: {total}\n"
-        f"Ручная сумма: {summa}\n"
-        f"Доставка: {delivery}\n"
-        f"Комментарий:{comment}\n"
-        f"Адрес: {address}\n"
-        f"Товары: {', '.join([f'{i['name']} x{i['quantity']}' for i in items])}"
-    )
+    f"Клиент: {username}\n"
+    f"Оплата: {payment}\n"
+    f"Сумма: {total}\n"
+    f"Ручная сумма: {summa}\n"
+    f"Доставка: {delivery}\n"
+    f"Комментарий: {comment}\n"
+    f"Адрес: {address}\n"
+    f"Товары: {', '.join(['{} x{}'.format(i['name'], i['quantity']) for i in items])}"
+)
 
     return {
         'Клиент': username,
