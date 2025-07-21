@@ -24,7 +24,6 @@ async def create_order(data, update):
         project_hrefs = json.load(f)
 
     href = project_hrefs.get(data['payment'].lower(), None)
-    
     order_data["project"] = {
        "meta": {
            "href": href,
