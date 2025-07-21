@@ -9,6 +9,8 @@ from create_order import create_order
 from telegram import Update
 from datetime import datetime
 import pytz
+import base64
+import os
 
 
 # словарь: username -> обработчик
