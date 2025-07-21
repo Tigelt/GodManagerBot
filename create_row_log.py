@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 async def create_row_log(data, update):
     # Настройка доступа
     scope = ["https://spreadsheets.google.com/feeds",'https://www.googleapis.com/auth/drive']
-    creds = ServiceAccountCredentials.from_json_keyfile_name("shisha-464813-f958df479144.json", scope)
+    creds = ServiceAccountCredentials.from_json_keyfile_name("shisha-464813-781e939944ae.json", scope)
     client = gspread.authorize(creds)
     sheet = client.open_by_key("10u_ZTPARIIH6Sow7iDxasJFFerfSX2sD36mF5krMBW8").sheet1
 
