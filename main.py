@@ -7,6 +7,9 @@ from create_row_gastro import create_row_gastro
 from configMC import BOT_TOKEN
 from create_order import create_order
 from telegram import Update
+from datetime import datetime
+import pytz
+
 
 # словарь: username -> обработчик
 USER_HANDLERS = {
@@ -37,6 +40,9 @@ async def handle_elis(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user.username
     handler_name = USER_HANDLERS.get(user)
+    print("Время сервера UTC:", datetime.utcnow())
+    print("Время сервера Asia/Ho_Chi_Minh:", datetime.now(pytz.timezone("Asia/Ho_Chi_Minh")))
+
     if handler_name:
         # динамически вызовем нужную функцию
         await globals()[handler_name](update, context)
