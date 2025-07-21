@@ -1,25 +1,24 @@
+from configMC import headers
+
 async def parse_message(text, update):
     lines = [line.strip() for line in text.split('\n')]
     lines_iter = iter(lines)
-
+    
+    # Функция для получения следующей непустой строки
     def next_non_empty():
         for line in lines_iter:
             if line.strip():
                 return line.strip()
         return None
-
     # читаем строго по шаблону
     username = next_non_empty()
     payment = next_non_empty()
     summa = int(next_non_empty())
     delivery = int(next_non_empty())
-
-    # комментарий до пустой строки
     comment = next_non_empty()
-
-    # теперь адрес
     address = next_non_empty()
-    # print(address)
+    number = next_non_empty()
+    number = number[1:] if number.startswith('+') else number
 
     # товары
     total = 0
@@ -51,16 +50,19 @@ async def parse_message(text, update):
     f"Доставка: {delivery}\n"
     f"Комментарий: {comment}\n"
     f"Адрес: {address}\n"
+    f"Номер: {number}\n"
     f"Товары: {', '.join(['{} x{}'.format(i['name'], i['quantity']) for i in items])}"
 )
 
     return {
-        'Клиент': username,
-        'Способ оплаты': payment,
-        'Сумма': total,
-        'Ручная сумма': summa,
-        'Доставка': delivery,
-        'Комментарий': comment,
-        'Адрес': address,
-        'Заказ': items
+        'username': username,
+        'payment': payment,
+        'total': total,
+        'summa': summa,
+        'delivery': delivery,
+        'comment': comment,
+        'address': address,
+        'number': number,
+        'items': items
     }
+
