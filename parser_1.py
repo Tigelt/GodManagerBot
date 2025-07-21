@@ -1,4 +1,4 @@
-from configMC import headers
+from configMC import headers, ABBREVIATIONS
 
 async def parse_message(text, update):
     lines = [line.strip() for line in text.split('\n')]
@@ -29,9 +29,14 @@ async def parse_message(text, update):
             if len(parts) < 3:
                 await update.message.reply_text(f"Ошибка в строке товара: {line}")
                 raise ValueError(f"Ошибка в строке товара: {line}")
-            name = ' '.join(parts[:-2])
+            name = ' '.join(parts[:-2]).lower()
             quantity = int(parts[-2])
             price = int(parts[-1])
+            
+            for abbr, full in ABBREVIATIONS.items():
+                if name.startswith(abbr + " "):
+                    name = name.replace(abbr, full, 1)
+                    break
             items.append({
                 'name': name,
                 'quantity': quantity,

@@ -23,7 +23,7 @@ async def create_row_shisha(data, update):
     transfer = ''
     if 'наличные' in data['payment'].lower():
         cash = data['summa']
-    elif 'иванqr' in data['payment'].lower():
+    elif 'иванкр' in data['payment'].lower():
         transfer = data['summa']
     elif 'перевод' in data['payment'].lower():
         cash = 0
@@ -33,9 +33,10 @@ async def create_row_shisha(data, update):
     # Соберём заказ в текст
     order_text = "\n".join([f"{item['name']} x{item['quantity']}" for item in data['items']])
     # Собираем строку для таблицы
-    row = [date_now, client_link, str(delivery), str(cash), str(transfer)]
+    row = [date_now, client_link, delivery, cash, transfer]
     try:
-        sheet.append_row(row, value_input_option="USER_ENTERED")
+        #sheet.append_row(row, value_input_option="USER_ENTERED")
+        sheet.insert_row(row, index=4, value_input_option="RAW")
         print("✅ Строка вставлена в ShiSha")
         await update.message.reply_text(f"✅ Строка вставлена в ShiSha")
     except Exception as e:

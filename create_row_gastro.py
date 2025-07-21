@@ -31,7 +31,8 @@ async def create_row_gastro(data, update):
     # Собираем строку для таблицы
     row = [date_now, client_name, delivery, cash, transfer]
     try:
-        sheet.append_row(row, value_input_option="USER_ENTERED")
+        #sheet.append_row(row, value_input_option="USER_ENTERED")
+        sheet.insert_row(row, index=4)
         print("✅ Строка вставлена в GastroHeaven")
         await update.message.reply_text(f"✅ Строка вставлена в GastroHeaven")
     except Exception as e:

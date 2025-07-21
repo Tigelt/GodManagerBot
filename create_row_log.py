@@ -1,6 +1,8 @@
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime, timedelta
+from gspread_formatting import CellFormat, Color, format_cell_range
+
 
 async def create_row_log(data, update):
     # Настройка доступа
@@ -10,6 +12,7 @@ async def create_row_log(data, update):
     sheet = client.open_by_key("10u_ZTPARIIH6Sow7iDxasJFFerfSX2sD36mF5krMBW8").sheet1
 
 	# Подготовим данные
+    org = update.message.from_user.username
     now = datetime.utcnow() + timedelta(hours=7)
     date_str = now.strftime("%d.%m")
     time_str = now.strftime("%H:%M")
@@ -21,26 +24,41 @@ async def create_row_log(data, update):
     comment = data['comment']
     cash = ''
     transfer = ''
-    print(data['payment'].lower())
+ 
     if 'наличные' in data['payment'].lower():
         cash = data['summa']
-    elif 'иванqr' in data['payment'].lower():
+    elif 'иванкр' in data['payment'].lower():
         transfer = data['summa']
     elif 'перевод' in data['payment'].lower():
         transfer = data['summa']
     else:
         cash = data['summa']
+ ###       
+    user = update.message.from_user.username
+    color = (
+    "blue" if "ShishaDanang" in user else
+    "yellow" if "Gastroheaven" in user else
+    "white"
+    )
 
-    # Соберём заказ в текст
+# Соберём заказ
     order_text = "\n".join([f"{item['name']} x{item['quantity']}" for item in data['items']])
-    # Собираем строку для таблицы
     row = [date_now, client_link, address, number, comment, cash, transfer, order_text]
-    try:
-        sheet.append_row(row, value_input_option="USER_ENTERED")
-        print("✅ Строка вставлена в Логистику")
-        await update.message.reply_text(f"✅ Строка вставлена в Логистику")
-    except Exception as e:
-        print("❌ Ошибка при вставке в Логистику строки:", e)
-        await update.message.reply_text(f"❌ Ошибка при вставке в Логистику строки: {e}")
 
-    
+    try:
+        sheet.insert_row(row, index=2)
+
+        # Красим вторую строку (теперь именно она вставлена)
+        fmt = CellFormat(backgroundColor={
+            "blue":   Color(0.678, 0.847, 0.902),
+            "yellow": Color(1, 1, 0.6),
+            "white":  Color(1, 1, 1)
+        }[color])
+        format_cell_range(sheet, "A2:H2", fmt)
+
+        print("✅ Строка вставлена во вторую строку и покрашена")
+        await update.message.reply_text("✅ Строка вставлена во вторую строку и покрашена")
+
+    except Exception as e:
+        print("❌ Ошибка при вставке строки:", e)
+        await update.message.reply_text(f"❌ Ошибка: {e}")

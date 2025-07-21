@@ -28,7 +28,7 @@ def find_agent_by_name(agent_name):
     # Проверим в текущем JSON
     #href = agents.get(agent_name)
     href = smart_get(agents, agent_name)
-    print(href)
+    
     if href:
         print(f"Контрагент {agent_name} найден в локальном JSON.")
         return href

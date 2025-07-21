@@ -20,10 +20,7 @@ async def create_order(data, update):
     }
 
     # Указываю проект
-    with open("requestsMC/data/shisha/ProjectNameHref.json", "r", encoding="utf-8") as f:
-        project_hrefs = json.load(f)
-
-    href = project_hrefs.get(data['payment'].lower(), None)
+    href = PROJECT_HREFS.get(data['payment'].lower(), None)
     order_data["project"] = {
        "meta": {
            "href": href,

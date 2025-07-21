@@ -13,9 +13,9 @@ IvanActual_href = "https://api.moysklad.ru/api/remap/1.2/entity/store/5b0a00a8-3
 IvanActual_id = "f46aa6b7-8ec1-11ef-0a80-00b7000fc6f3"
 
 PROJECT_HREFS = {
-    "Наличные": "https://api.moysklad.ru/api/remap/1.2/entity/project/fbc90130-a58e-11ef-0a80-0e2100006983",
-    "Перевод": "https://api.moysklad.ru/api/remap/1.2/entity/project/ffd3fd9c-a58e-11ef-0a80-07aa00341c38",
-    "Перевод Иван": "https://api.moysklad.ru/api/remap/1.2/entity/project/c86ef78d-d18f-11ef-0a80-064d002bd9e7"
+    "наличные": "https://api.moysklad.ru/api/remap/1.2/entity/project/23438132-4056-11f0-0a80-1b67001ad0ff",
+    "перевод": "https://api.moysklad.ru/api/remap/1.2/entity/project/d70007c5-4055-11f0-0a80-1aa00019e2d0",
+    "иванкр": "https://api.moysklad.ru/api/remap/1.2/entity/project/db108373-4054-11f0-0a80-0c380019fcec"
 }
 
 order_data = {
@@ -34,4 +34,11 @@ order_data = {
             }
         },
         "reserve": True
+}
+
+ABBREVIATIONS = {
+    "bb": "Blackburn",
+    "cb": "Chabacco",
+    "ds": "Darkside",
+    "mh": "Musthave"
 }
