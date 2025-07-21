@@ -52,5 +52,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 if __name__ == "__main__":
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(MessageHandler(filters.ALL, handle_message))
+    
+    key_b64 = os.environ.get("KEY_JSON_BASE64")
+    key_path = "shisha-464813-781e939944ae.json" 
+    if key_b64:
+        with open(key_path, "wb") as f:
+            f.write(base64.b64decode(key_b64))
+    else:
+        raise RuntimeError("KEY_JSON_BASE64 is not set")
+    
     print("Бот запущен...")
     app.run_polling()
