@@ -1,3 +1,4 @@
+from telethon import TelegramClient
 from configMC import headers, ABBREVIATIONS
 
 async def parse_message(text, update):
@@ -12,13 +13,19 @@ async def parse_message(text, update):
         return None
     # читаем строго по шаблону
     username = next_non_empty()
+    usernameME = await get_full_name(username)
+    user = f"{usernameME} {username}"
+    #print(f"Получено сообщение от {username} ({usernameME})")
+
     payment = next_non_empty()
     summa = int(next_non_empty())
     delivery = int(next_non_empty())
     comment = next_non_empty()
-    address = next_non_empty()
-    number = next_non_empty()
-    number = number[1:] if number.startswith('+') else number
+    #address = next_non_empty()
+    #number = next_non_empty()
+    #number = number[1:] if number.startswith('+') else number
+    address = ''
+    number = ''
 
     # товары
     total = 0
@@ -44,23 +51,23 @@ async def parse_message(text, update):
             })
             total += price
 
-    if summa != total+delivery:
-        await update.message.reply_text(f"Доставка в накладных расходах")
 
     await update.message.reply_text(
-    f"Клиент: {username}\n"
+    f"Клиент: {user}\n"
     f"Оплата: {payment}\n"
-    f"Сумма: {total}\n"
+    #f"Сумма: {total}\n"
     f"Ручная сумма: {summa}\n"
+    f"Сумма заказа: {total}\n"
     f"Доставка: {delivery}\n"
-    f"Комментарий: {comment}\n"
-    f"Адрес: {address}\n"
-    f"Номер: {number}\n"
-    f"Товары: {', '.join(['{} x{}'.format(i['name'], i['quantity']) for i in items])}"
+    #f"Комментарий: {comment}\n"
+    #f"Адрес: {address}\n"
+    #f"Номер: {number}\n"
+    #f"Товары: {', '.join(['{} x{}'.format(i['name'], i['quantity']) for i in items])}"
 )
 
     return {
         'username': username,
+        'full_name': user,
         'payment': payment,
         'total': total,
         'summa': summa,
@@ -71,3 +78,17 @@ async def parse_message(text, update):
         'items': items
     }
 
+
+
+async def get_full_name(username):
+    API_ID = 20732915
+    API_HASH = '76a13ac0c9479ad595d3a0f71be8e43d'   
+
+    try:
+        async with TelegramClient('aimanager', API_ID, API_HASH) as client:
+            user = await client.get_entity(username)
+            full_name = f"{user.first_name or ''} {user.last_name or ''}".strip()
+            return full_name
+    except Exception as e:
+        print(f"⚠️ Не удалось получить имя для {username}: {e}")
+        return ""

@@ -56,8 +56,8 @@ async def create_row_log(data, update):
         }[color])
         format_cell_range(sheet, "A2:H2", fmt)
 
-        print("✅ Строка вставлена во вторую строку и покрашена")
-        await update.message.reply_text("✅ Строка вставлена во вторую строку и покрашена")
+        print("✅ Запись в логистику успешно добавлена")
+        await update.message.reply_text("✅ Запись в логистику успешно добавлена")
 
     except Exception as e:
         print("❌ Ошибка при вставке строки:", e)
