@@ -84,12 +84,11 @@ async def create_demand_for_order(order_href, update, context, overheads):
             # Потом обновляем сообщения в форуме
             from requestsMC.publish_assortment import update_assortment
             await update_assortment(update, context)
-            print("✅ Ассортимент обновлен после отгрузки")
         except Exception as e:
             print(f"❌ Ошибка обновления ассортимента: {e}")
         
         return response
     else:
-        
         await update.effective_chat.send_message(f"⚠️ Не удалось создать отгрузку: {response.text}")
+        return response
         return response

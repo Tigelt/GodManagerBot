@@ -99,12 +99,15 @@ def format_brand_message_with_links(brand_name, whole_packs, loose_packs):
         quantity = flavor.get("quantity", 0)
         link = flavor.get("link")
         
+        # Ограничиваем количество до 3+
+        display_quantity = "3+" if quantity > 3 else str(quantity)
+        
         if link:
             # Добавляем гиперссылку
-            message += f"[{name}]({link}) {quantity}\n"
+            message += f"[{name}]({link}) {display_quantity}\n"
         else:
             # Без гиперссылки, обычное название
-            message += f"{name} {quantity}\n"
+            message += f"{name} {display_quantity}\n"
     
     # Добавляем разделитель и вскрытые вкусы, если есть
     if loose_packs:
@@ -122,9 +125,7 @@ def format_brand_message_with_links(brand_name, whole_packs, loose_packs):
                 # Без гиперссылки, обычное название с количеством грамм
                 message += f"{name} {quantity}г\n"
     
-    # Общее количество (только целые пачки)
-    total_sum = sum(flavor.get("quantity", 0) for flavor in whole_packs)
-    message += f"\n**📦 Всего: {total_sum}**"
+    # Убираем строку "Всего" полностью
     
     return message
 
@@ -353,6 +354,12 @@ async def update_assortment(update, context):
                             print(f"❌ Ошибка обновления сообщения {i+1}: {e}")
             
             print("🎉 Обновление ассортимента завершено!")
+            
+            # Отправляем уведомление в Telegram
+            try:
+                await update.effective_chat.send_message("✅ Ассортимент обновлен после отгрузки")
+            except Exception as e:
+                print(f"❌ Ошибка отправки уведомления: {e}")
             
         except Exception as e:
             print(f"❌ Ошибка обновления: {e}")
