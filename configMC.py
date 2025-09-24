@@ -4,7 +4,54 @@ headers = {
     'Content-Type': 'application/json'
 }
 
-BOT_TOKEN = "7261041875:AAFOSkUuITFSHqwy19fJgLBSakke-n5zEJs"
+BOT_TOKEN = "7261041875:AAE5Ez4yBH9RE85aPu4FdTHoZLAKgC6fAiQ"
+
+# Telethon настройки
+API_ID = 14739654
+API_HASH = '98c13db08224026ed85682c5ed3e1834'
+
+# Telegram настройки
+FORUM_CHAT_ID = '@gogoelis'  # ID чата форума для публикации ассортимента
+FORUM_THREAD_ID = 2  # ID ветки форума
+
+# Канал с описаниями вкусов
+FLAVOR_CHANNEL = '@shisha_danang'
+FLAVOR_THREAD_ID = 16  # ID ветки с описаниями вкусов
+
+# Пути к файлам
+DATA_DIR = "requestsMC/data/shisha/"
+SESSION_FILE = "aimanager.session"
+IMAGES_DIR = "images/brands/"
+
+# Актуальный ассортимент брендов
+ACTUAL_BRANDS = [
+    "Musthave",
+    "Darkside", 
+    "Blackburn",
+    "DS shot",
+    "Chabacco",
+    "Satyr",
+    "Xperience",
+    "Trofimoff's",
+    "Overdose",
+    "Starline",
+    "Энтузиаст"
+]
+
+# Маппинг брендов к изображениям
+BRAND_IMAGES = {
+    "Musthave": "musthave.jpg",
+    "Darkside": "darkside.JPG", 
+    "Blackburn": "blackburn.JPG",
+    "DS shot": "ds_shot.JPG",
+    "Chabacco": "chabacco.JPG",
+    "Satyr": "satyr.jpg",
+    "Darkside Xperience": "darkside_xperience.JPG",
+    "Trofimoff's": "trofimoff.jpg",
+    "Overdose": "overdose.JPG",
+    "Starline": "starline.jpg",
+    "Энтузиаст": "entuziast.jpg"
+}
 
 
 organization_href = "https://api.moysklad.ru/api/remap/1.2/entity/organization/633ef336-39e0-11f0-0a80-065e00264b61"

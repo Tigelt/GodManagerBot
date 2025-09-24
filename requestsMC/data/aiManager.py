@@ -3,8 +3,8 @@ from telethon import TelegramClient
 from telethon.tl.types import User
 
 async def dump_personals(out_file="personal_dialogs.ndjson"):
-    API_ID = 20732915
-    API_HASH = '76a13ac0c9479ad595d3a0f71be8e43d'   
+    API_ID = 14739654
+    API_HASH = '98c13db08224026ed85682c5ed3e1834'   
 
     async with TelegramClient('aimanager', API_ID, API_HASH) as client:
            with open(out_file, "a", encoding="utf-8") as f:

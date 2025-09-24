@@ -160,3 +160,4 @@ async def handle_order_callback(update, context):
 
     elif query.data == "cancel_order":
         await query.edit_message_text("❌ Заказ отменён.")
+

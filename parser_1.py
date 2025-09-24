@@ -81,8 +81,8 @@ async def parse_message(text, update):
 
 
 async def get_full_name(username):
-    API_ID = 20732915
-    API_HASH = '76a13ac0c9479ad595d3a0f71be8e43d'   
+    API_ID = 14739654
+    API_HASH = '98c13db08224026ed85682c5ed3e1834'   
 
     try:
         async with TelegramClient('aimanager', API_ID, API_HASH) as client:

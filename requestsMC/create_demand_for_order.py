@@ -74,6 +74,20 @@ async def create_demand_for_order(order_href, update, context, overheads):
 
     if response.status_code == 200:
         await update.effective_chat.send_message("📦 Отгрузка создана.")
+        
+        # Обновляем ассортимент после успешной отгрузки
+        try:
+            # Сначала обновляем данные из Мой Склад
+            from requestsMC.prepare_assortment import prepareAssortment
+            await prepareAssortment()
+            
+            # Потом обновляем сообщения в форуме
+            from requestsMC.publish_assortment import update_assortment
+            await update_assortment(update, context)
+            print("✅ Ассортимент обновлен после отгрузки")
+        except Exception as e:
+            print(f"❌ Ошибка обновления ассортимента: {e}")
+        
         return response
     else:
         

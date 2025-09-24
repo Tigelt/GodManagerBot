@@ -1,18 +1,17 @@
-# Используем официальный Python-образ
-FROM python:3.11-slim
+# Используем Python 3.9
+FROM python:3.9-slim
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Копируем зависимости
+# Копируем файл зависимостей
 COPY requirements.txt .
 
 # Устанавливаем зависимости
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Команда запуска
+# Копируем весь проект
+COPY . .
+
+# Указываем команду запуска
 CMD ["python", "main.py"]
-
-ENV PYTHONUNBUFFERED=1
-
-COPY . /app

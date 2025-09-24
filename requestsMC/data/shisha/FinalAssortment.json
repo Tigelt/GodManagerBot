@@ -1,0 +1,1828 @@
+{
+  "Musthave": {
+    "whole_packs": [
+      {
+        "name": "Caribbean Rum",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/6142"
+      },
+      {
+        "name": "Choco Mint",
+        "quantity": 1,
+        "link": "https://t.me/shisha_danang/980"
+      },
+      {
+        "name": "Cinnamon",
+        "quantity": 4,
+        "link": "https://t.me/shisha_danang/981"
+      },
+      {
+        "name": "Citrus Spritz",
+        "quantity": 1,
+        "link": "https://t.me/shisha_danang/982"
+      },
+      {
+        "name": "Cola",
+        "quantity": 5,
+        "link": "https://t.me/shisha_danang/984"
+      },
+      {
+        "name": "Cream Soda",
+        "quantity": 4,
+        "link": null
+      },
+      {
+        "name": "Fizzy Dizzy",
+        "quantity": 3,
+        "link": "https://t.me/shisha_danang/993"
+      },
+      {
+        "name": "Nord Star",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/1014"
+      },
+      {
+        "name": "Paradise",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Quince",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/1027"
+      },
+      {
+        "name": "Red Bomb",
+        "quantity": 1,
+        "link": "https://t.me/shisha_danang/1021"
+      },
+      {
+        "name": "Tipsy",
+        "quantity": 3,
+        "link": "https://t.me/shisha_danang/1028"
+      },
+      {
+        "name": "Vanilla Cream",
+        "quantity": 1,
+        "link": "https://t.me/shisha_danang/1031"
+      }
+    ],
+    "loose_packs": [
+      {
+        "name": "Apple Drops",
+        "quantity": 50,
+        "link": "https://t.me/shisha_danang/965"
+      },
+      {
+        "name": "Baikal",
+        "quantity": 50,
+        "link": "https://t.me/shisha_danang/971"
+      },
+      {
+        "name": "Banana Mama",
+        "quantity": 100,
+        "link": null
+      },
+      {
+        "name": "Blackberry",
+        "quantity": 25,
+        "link": null
+      },
+      {
+        "name": "Cacao",
+        "quantity": 50,
+        "link": "https://t.me/shisha_danang/983"
+      },
+      {
+        "name": "Caribbean Rum",
+        "quantity": 25,
+        "link": "https://t.me/shisha_danang/6142"
+      },
+      {
+        "name": "Cheesecake",
+        "quantity": 75,
+        "link": "https://t.me/shisha_danang/978"
+      },
+      {
+        "name": "Cherry Cola",
+        "quantity": 75,
+        "link": "https://t.me/shisha_danang/979"
+      },
+      {
+        "name": "Choco Mint",
+        "quantity": 50,
+        "link": "https://t.me/shisha_danang/980"
+      },
+      {
+        "name": "Cinnamon",
+        "quantity": 50,
+        "link": "https://t.me/shisha_danang/981"
+      },
+      {
+        "name": "Cola",
+        "quantity": 50,
+        "link": "https://t.me/shisha_danang/984"
+      },
+      {
+        "name": "Cookie",
+        "quantity": 75,
+        "link": "https://t.me/shisha_danang/986"
+      },
+      {
+        "name": "Cranberry",
+        "quantity": 100,
+        "link": "https://t.me/shisha_danang/987"
+      },
+      {
+        "name": "Feijoa",
+        "quantity": 75,
+        "link": "https://t.me/shisha_danang/992"
+      },
+      {
+        "name": "Fizzy Dizzy",
+        "quantity": 75,
+        "link": "https://t.me/shisha_danang/993"
+      },
+      {
+        "name": "Garnet Grape",
+        "quantity": 25,
+        "link": null
+      },
+      {
+        "name": "Grapefruit",
+        "quantity": 25,
+        "link": "https://t.me/shisha_danang/997"
+      },
+      {
+        "name": "Green Fizz",
+        "quantity": 75,
+        "link": null
+      },
+      {
+        "name": "Guanapapa",
+        "quantity": 25,
+        "link": null
+      },
+      {
+        "name": "Holland Pie",
+        "quantity": 75,
+        "link": null
+      },
+      {
+        "name": "Honey Holls",
+        "quantity": 100,
+        "link": null
+      },
+      {
+        "name": "Ice Cream",
+        "quantity": 125,
+        "link": "https://t.me/shisha_danang/999"
+      },
+      {
+        "name": "Jumango",
+        "quantity": 150,
+        "link": "https://t.me/shisha_danang/1001"
+      },
+      {
+        "name": "Lemon-Lime",
+        "quantity": 50,
+        "link": null
+      },
+      {
+        "name": "Mandarin",
+        "quantity": 25,
+        "link": "https://t.me/shisha_danang/1006"
+      },
+      {
+        "name": "Marula",
+        "quantity": 75,
+        "link": null
+      },
+      {
+        "name": "Milk Oolong",
+        "quantity": 150,
+        "link": "https://t.me/shisha_danang/1011"
+      },
+      {
+        "name": "Mulled Wine",
+        "quantity": 50,
+        "link": "https://t.me/shisha_danang/1013"
+      },
+      {
+        "name": "Passion Plum",
+        "quantity": 50,
+        "link": null
+      },
+      {
+        "name": "Pineapple Rings",
+        "quantity": 75,
+        "link": "https://t.me/shisha_danang/1017"
+      },
+      {
+        "name": "Prosecco",
+        "quantity": 50,
+        "link": "https://t.me/shisha_danang/1018"
+      },
+      {
+        "name": "Red Bomb",
+        "quantity": 25,
+        "link": "https://t.me/shisha_danang/1021"
+      },
+      {
+        "name": "Unicorn Treats",
+        "quantity": 175,
+        "link": "https://t.me/shisha_danang/1030"
+      },
+      {
+        "name": "Vanilla Cream",
+        "quantity": 50,
+        "link": "https://t.me/shisha_danang/1031"
+      },
+      {
+        "name": "Watermelon",
+        "quantity": 25,
+        "link": "https://t.me/shisha_danang/1033"
+      }
+    ]
+  },
+  "Darkside": {
+    "whole_packs": [
+      {
+        "name": "Admiral Acbar",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Bananapapa",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/1053"
+      },
+      {
+        "name": "Barvy Citrus",
+        "quantity": 5,
+        "link": "https://t.me/shisha_danang/1054"
+      },
+      {
+        "name": "Basil Blast",
+        "quantity": 6,
+        "link": "https://t.me/shisha_danang/1056"
+      },
+      {
+        "name": "Bassberry",
+        "quantity": 4,
+        "link": null
+      },
+      {
+        "name": "Bergamonstr",
+        "quantity": 6,
+        "link": "https://t.me/shisha_danang/1057"
+      },
+      {
+        "name": "Blackcurrant",
+        "quantity": 8,
+        "link": "https://t.me/shisha_danang/1058"
+      },
+      {
+        "name": "Blueberry Blast",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/1060"
+      },
+      {
+        "name": "Bounty Hunter",
+        "quantity": 8,
+        "link": "https://t.me/shisha_danang/1059"
+      },
+      {
+        "name": "Cherry Rocks",
+        "quantity": 7,
+        "link": "https://t.me/shisha_danang/1062"
+      },
+      {
+        "name": "Code Cherry",
+        "quantity": 5,
+        "link": null
+      },
+      {
+        "name": "Cosmo Flower",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Cosmos",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/1065"
+      },
+      {
+        "name": "Crystal Grape",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/1066"
+      },
+      {
+        "name": "Cyber Kiwi",
+        "quantity": 5,
+        "link": "https://t.me/shisha_danang/1064"
+      },
+      {
+        "name": "Dark Icecream",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/1067"
+      },
+      {
+        "name": "Dark Passion",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/1076"
+      },
+      {
+        "name": "Cola",
+        "quantity": 14,
+        "link": null
+      },
+      {
+        "name": "Darksupra",
+        "quantity": 3,
+        "link": "https://t.me/shisha_danang/1078"
+      },
+      {
+        "name": "Deep Blue Sea",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/1079"
+      },
+      {
+        "name": "Falling Star",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/1080"
+      },
+      {
+        "name": "Fruittallity",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Fruity Dust",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/1082"
+      },
+      {
+        "name": "Generis Raspberry",
+        "quantity": 1,
+        "link": "https://t.me/shisha_danang/1083"
+      },
+      {
+        "name": "Glitch Ice Tea",
+        "quantity": 10,
+        "link": null
+      },
+      {
+        "name": "Grape Core",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/1086"
+      },
+      {
+        "name": "Green Beam",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/1087"
+      },
+      {
+        "name": "Green Mist",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Guava Rebel",
+        "quantity": 3,
+        "link": null
+      },
+      {
+        "name": "Honey Dust",
+        "quantity": 5,
+        "link": "https://t.me/shisha_danang/1155"
+      },
+      {
+        "name": "Kalee Grapefruit 2.0",
+        "quantity": 8,
+        "link": null
+      },
+      {
+        "name": "Killer Milk",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/1158"
+      },
+      {
+        "name": "Lemonblast",
+        "quantity": 4,
+        "link": "https://t.me/shisha_danang/1159"
+      },
+      {
+        "name": "Mango Lassi",
+        "quantity": 13,
+        "link": "https://t.me/shisha_danang/1197"
+      },
+      {
+        "name": "Needls",
+        "quantity": 5,
+        "link": "https://t.me/shisha_danang/1198"
+      },
+      {
+        "name": "Nordberry",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/1199"
+      },
+      {
+        "name": "Pear",
+        "quantity": 8,
+        "link": "https://t.me/shisha_danang/1200"
+      },
+      {
+        "name": "Pineapple Pulse",
+        "quantity": 9,
+        "link": "https://t.me/shisha_danang/1201"
+      },
+      {
+        "name": "Polar Cream",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Pomelow",
+        "quantity": 5,
+        "link": "https://t.me/shisha_danang/1202"
+      },
+      {
+        "name": "Raf In the Jungle",
+        "quantity": 1,
+        "link": "https://t.me/shisha_danang/1203"
+      },
+      {
+        "name": "Red Alert",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/1204"
+      },
+      {
+        "name": "Redberry",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Red Tea",
+        "quantity": 4,
+        "link": "https://t.me/shisha_danang/1206"
+      },
+      {
+        "name": "Red Zeppelin",
+        "quantity": 1,
+        "link": "https://t.me/shisha_danang/1207"
+      },
+      {
+        "name": "Salbei",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/1208"
+      },
+      {
+        "name": "Space Jam",
+        "quantity": 3,
+        "link": "https://t.me/shisha_danang/1209"
+      },
+      {
+        "name": "Strawberry Light",
+        "quantity": 1,
+        "link": "https://t.me/shisha_danang/1210"
+      },
+      {
+        "name": "Supernova",
+        "quantity": 21,
+        "link": "https://t.me/shisha_danang/1211"
+      },
+      {
+        "name": "Sweet Comet",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Torpedo",
+        "quantity": 5,
+        "link": "https://t.me/shisha_danang/1212"
+      },
+      {
+        "name": "Tropic Ray",
+        "quantity": 5,
+        "link": "https://t.me/shisha_danang/1213"
+      },
+      {
+        "name": "Virgin Melon",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/1214"
+      },
+      {
+        "name": "Virgin Peach",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/1215"
+      },
+      {
+        "name": "Wildberry",
+        "quantity": 4,
+        "link": null
+      },
+      {
+        "name": "Wild Forest",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/1217"
+      }
+    ],
+    "loose_packs": [
+      {
+        "name": "Admiral Acbar",
+        "quantity": 75,
+        "link": null
+      },
+      {
+        "name": "Basil Blast",
+        "quantity": 50,
+        "link": "https://t.me/shisha_danang/1056"
+      },
+      {
+        "name": "Bergamonstr",
+        "quantity": 125,
+        "link": "https://t.me/shisha_danang/1057"
+      },
+      {
+        "name": "Blueberry Blast",
+        "quantity": 50,
+        "link": "https://t.me/shisha_danang/1060"
+      },
+      {
+        "name": "Bounty Hunter",
+        "quantity": 75,
+        "link": "https://t.me/shisha_danang/1059"
+      },
+      {
+        "name": "Cherry Rocks",
+        "quantity": 50,
+        "link": "https://t.me/shisha_danang/1062"
+      },
+      {
+        "name": "Code Cherry",
+        "quantity": 50,
+        "link": null
+      },
+      {
+        "name": "C.R.E.A.M. S.O.D.A.",
+        "quantity": 50,
+        "link": null
+      },
+      {
+        "name": "Cyber Kiwi",
+        "quantity": 75,
+        "link": "https://t.me/shisha_danang/1064"
+      },
+      {
+        "name": "Dark Icecream",
+        "quantity": 75,
+        "link": "https://t.me/shisha_danang/1067"
+      },
+      {
+        "name": "Darksupra",
+        "quantity": 100,
+        "link": "https://t.me/shisha_danang/1078"
+      },
+      {
+        "name": "Deep Blue Sea",
+        "quantity": 75,
+        "link": "https://t.me/shisha_danang/1079"
+      },
+      {
+        "name": "Falling Star",
+        "quantity": 50,
+        "link": "https://t.me/shisha_danang/1080"
+      },
+      {
+        "name": "Fruittallity",
+        "quantity": 100,
+        "link": null
+      },
+      {
+        "name": "Generis Raspberry",
+        "quantity": 50,
+        "link": "https://t.me/shisha_danang/1083"
+      },
+      {
+        "name": "Goal",
+        "quantity": 50,
+        "link": "https://t.me/shisha_danang/1154"
+      },
+      {
+        "name": "Grape Core",
+        "quantity": 75,
+        "link": "https://t.me/shisha_danang/1086"
+      },
+      {
+        "name": "Green Beam",
+        "quantity": 25,
+        "link": "https://t.me/shisha_danang/1087"
+      },
+      {
+        "name": "Ice Granny",
+        "quantity": 50,
+        "link": "https://t.me/shisha_danang/1156"
+      },
+      {
+        "name": "Lemonblast",
+        "quantity": 75,
+        "link": "https://t.me/shisha_danang/1159"
+      },
+      {
+        "name": "Needls",
+        "quantity": 50,
+        "link": "https://t.me/shisha_danang/1198"
+      },
+      {
+        "name": "Nordberry",
+        "quantity": 75,
+        "link": "https://t.me/shisha_danang/1199"
+      },
+      {
+        "name": "Pineapple Pulse",
+        "quantity": 50,
+        "link": "https://t.me/shisha_danang/1201"
+      },
+      {
+        "name": "Polar Cream",
+        "quantity": 200,
+        "link": null
+      },
+      {
+        "name": "Raf In the Jungle",
+        "quantity": 50,
+        "link": "https://t.me/shisha_danang/1203"
+      },
+      {
+        "name": "Red Alert",
+        "quantity": 75,
+        "link": "https://t.me/shisha_danang/1204"
+      },
+      {
+        "name": "Red Tea",
+        "quantity": 25,
+        "link": "https://t.me/shisha_danang/1206"
+      },
+      {
+        "name": "Salbei",
+        "quantity": 75,
+        "link": "https://t.me/shisha_danang/1208"
+      },
+      {
+        "name": "Supernova",
+        "quantity": 75,
+        "link": "https://t.me/shisha_danang/1211"
+      },
+      {
+        "name": "Torpedo",
+        "quantity": 50,
+        "link": "https://t.me/shisha_danang/1212"
+      }
+    ]
+  },
+  "Blackburn": {
+    "whole_packs": [
+      {
+        "name": "Almond  Icecream",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Ananas Shock",
+        "quantity": 1,
+        "link": "https://t.me/shisha_danang/1230"
+      },
+      {
+        "name": "Apple Shock",
+        "quantity": 4,
+        "link": null
+      },
+      {
+        "name": "Asian Lychee",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Blackcola",
+        "quantity": 3,
+        "link": null
+      },
+      {
+        "name": "Brownie",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Cane Mint",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Cherry Garden",
+        "quantity": 1,
+        "link": "https://t.me/shisha_danang/1236"
+      },
+      {
+        "name": "Ekzo Mango",
+        "quantity": 3,
+        "link": null
+      },
+      {
+        "name": "Elka",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Epic Yogurt",
+        "quantity": 3,
+        "link": "https://t.me/shisha_danang/1241"
+      },
+      {
+        "name": "Etalon Melon",
+        "quantity": 3,
+        "link": "https://t.me/shisha_danang/1235"
+      },
+      {
+        "name": "Feijoa Jam",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Green Tea",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Haribon",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Iceberg",
+        "quantity": 4,
+        "link": null
+      },
+      {
+        "name": "Juicy Smoothie",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Malibu",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Mirinda",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Overdose",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Papaya v Obed",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Peach Berry",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Peach Yogurt",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Pinacolada",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Pineapple Yougurt",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Pistachio Ice Snow",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Red Energy",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Red Orange",
+        "quantity": 3,
+        "link": "https://t.me/shisha_danang/1238"
+      },
+      {
+        "name": "Something Berry",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Something Tropical",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Sou-Sep",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Strawberry Coconut",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Strawberry Jam",
+        "quantity": 3,
+        "link": null
+      },
+      {
+        "name": "Summer Basket",
+        "quantity": 5,
+        "link": null
+      },
+      {
+        "name": "Sunday Sun",
+        "quantity": 3,
+        "link": null
+      },
+      {
+        "name": "Tik Tak",
+        "quantity": 1,
+        "link": "https://t.me/shisha_danang/1240"
+      },
+      {
+        "name": "Watermelon",
+        "quantity": 3,
+        "link": null
+      },
+      {
+        "name": "На Чиле",
+        "quantity": 3,
+        "link": null
+      }
+    ],
+    "loose_packs": [
+      {
+        "name": "Ananas Shock",
+        "quantity": 25,
+        "link": "https://t.me/shisha_danang/1230"
+      },
+      {
+        "name": "Asian Lychee",
+        "quantity": 100,
+        "link": null
+      },
+      {
+        "name": "Bubblegum",
+        "quantity": 125,
+        "link": null
+      },
+      {
+        "name": "Cane Mint",
+        "quantity": 50,
+        "link": null
+      },
+      {
+        "name": "Cheesecake",
+        "quantity": 25,
+        "link": null
+      },
+      {
+        "name": "Cherry Garden",
+        "quantity": 175,
+        "link": "https://t.me/shisha_danang/1236"
+      },
+      {
+        "name": "Cherry Shock",
+        "quantity": 25,
+        "link": null
+      },
+      {
+        "name": "Elka",
+        "quantity": 25,
+        "link": null
+      },
+      {
+        "name": "Epic Yogurt",
+        "quantity": 50,
+        "link": "https://t.me/shisha_danang/1241"
+      },
+      {
+        "name": "Green Tea",
+        "quantity": 150,
+        "link": null
+      },
+      {
+        "name": "Haribon",
+        "quantity": 125,
+        "link": null
+      },
+      {
+        "name": "Iceberg",
+        "quantity": 50,
+        "link": null
+      },
+      {
+        "name": "Juicy Smoothie",
+        "quantity": 150,
+        "link": null
+      },
+      {
+        "name": "Kiwi Stoner",
+        "quantity": 100,
+        "link": null
+      },
+      {
+        "name": "Nutella",
+        "quantity": 50,
+        "link": null
+      },
+      {
+        "name": "Peach Berry",
+        "quantity": 250,
+        "link": null
+      },
+      {
+        "name": "Peach Killer",
+        "quantity": 75,
+        "link": null
+      },
+      {
+        "name": "Pinacolada",
+        "quantity": 25,
+        "link": null
+      },
+      {
+        "name": "Real P.F.",
+        "quantity": 100,
+        "link": null
+      },
+      {
+        "name": "Red Energy",
+        "quantity": 75,
+        "link": null
+      },
+      {
+        "name": "Strawberry Coconut",
+        "quantity": 75,
+        "link": null
+      },
+      {
+        "name": "Summer Basket",
+        "quantity": 175,
+        "link": null
+      },
+      {
+        "name": "Tik Tak",
+        "quantity": 125,
+        "link": "https://t.me/shisha_danang/1240"
+      }
+    ]
+  },
+  "DS shot": {
+    "whole_packs": [
+      {
+        "name": "Донской",
+        "quantity": 7,
+        "link": null
+      },
+      {
+        "name": "Западный",
+        "quantity": 3,
+        "link": null
+      },
+      {
+        "name": "Камчатский",
+        "quantity": 17,
+        "link": null
+      },
+      {
+        "name": "Куршский",
+        "quantity": 7,
+        "link": null
+      },
+      {
+        "name": "Охотский",
+        "quantity": 6,
+        "link": null
+      },
+      {
+        "name": "Тосканский",
+        "quantity": 15,
+        "link": null
+      },
+      {
+        "name": "Тропический",
+        "quantity": 8,
+        "link": null
+      },
+      {
+        "name": "Азовский",
+        "quantity": 7,
+        "link": null
+      },
+      {
+        "name": "Алтайский",
+        "quantity": 7,
+        "link": "https://t.me/shisha_danang/1261"
+      },
+      {
+        "name": "Альпийский",
+        "quantity": 15,
+        "link": null
+      },
+      {
+        "name": "Амурский",
+        "quantity": 6,
+        "link": "https://t.me/shisha_danang/1262"
+      },
+      {
+        "name": "Волжский",
+        "quantity": 15,
+        "link": null
+      },
+      {
+        "name": "Гавайский",
+        "quantity": 7,
+        "link": null
+      },
+      {
+        "name": "Горный",
+        "quantity": 6,
+        "link": null
+      },
+      {
+        "name": "Карельский",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/1264"
+      },
+      {
+        "name": "Каспийский",
+        "quantity": 6,
+        "link": "https://t.me/shisha_danang/1265"
+      },
+      {
+        "name": "Кольский",
+        "quantity": 6,
+        "link": "https://t.me/shisha_danang/1266"
+      },
+      {
+        "name": "Крымский",
+        "quantity": 7,
+        "link": "https://t.me/shisha_danang/1267"
+      },
+      {
+        "name": "Кубанский",
+        "quantity": 14,
+        "link": null
+      },
+      {
+        "name": "Курильский",
+        "quantity": 8,
+        "link": "https://t.me/shisha_danang/1268"
+      },
+      {
+        "name": "Ладожский",
+        "quantity": 7,
+        "link": "https://t.me/shisha_danang/1269"
+      },
+      {
+        "name": "Ленский",
+        "quantity": 10,
+        "link": null
+      },
+      {
+        "name": "Невский",
+        "quantity": 4,
+        "link": "https://t.me/shisha_danang/1274"
+      },
+      {
+        "name": "Окский",
+        "quantity": 3,
+        "link": null
+      },
+      {
+        "name": "Онежский",
+        "quantity": 13,
+        "link": "https://t.me/shisha_danang/1275"
+      },
+      {
+        "name": "Пляжный",
+        "quantity": 22,
+        "link": null
+      },
+      {
+        "name": "Приморский",
+        "quantity": 13,
+        "link": "https://t.me/shisha_danang/1276"
+      },
+      {
+        "name": "Пустынный",
+        "quantity": 15,
+        "link": null
+      },
+      {
+        "name": "Северный",
+        "quantity": 6,
+        "link": null
+      },
+      {
+        "name": "Сибирский",
+        "quantity": 7,
+        "link": null
+      },
+      {
+        "name": "Столичный",
+        "quantity": 4,
+        "link": "https://t.me/shisha_danang/1277"
+      },
+      {
+        "name": "Таежный",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Тайский",
+        "quantity": 5,
+        "link": null
+      },
+      {
+        "name": "Таманский",
+        "quantity": 8,
+        "link": null
+      },
+      {
+        "name": "Токийский",
+        "quantity": 6,
+        "link": null
+      },
+      {
+        "name": "Уральский",
+        "quantity": 8,
+        "link": null
+      },
+      {
+        "name": "Чукотский",
+        "quantity": 8,
+        "link": null
+      },
+      {
+        "name": "Южный",
+        "quantity": 6,
+        "link": "https://t.me/shisha_danang/1279"
+      },
+      {
+        "name": "Якутский",
+        "quantity": 8,
+        "link": null
+      }
+    ],
+    "loose_packs": [
+      {
+        "name": "Крымский",
+        "quantity": 50,
+        "link": "https://t.me/shisha_danang/1267"
+      },
+      {
+        "name": "Центральный",
+        "quantity": 25,
+        "link": "https://t.me/shisha_danang/1278"
+      }
+    ]
+  },
+  "Chabacco": {
+    "whole_packs": [
+      {
+        "name": "Dahongpao",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Белый Чай",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Жасминовый Моти",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Черный Чай",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Вишня",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Джэкфрут",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Кислая Брусника",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Красная Смородина",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Малина",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Печеное Яблоко",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Чай Сайган-Дайля",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Чай со смородиновым листом",
+        "quantity": 2,
+        "link": null
+      }
+    ],
+    "loose_packs": [
+      {
+        "name": "Mango Oolong",
+        "quantity": 100,
+        "link": null
+      },
+      {
+        "name": "Грушевые Леденцы",
+        "quantity": 75,
+        "link": null
+      },
+      {
+        "name": "Экзотик Фреш",
+        "quantity": 150,
+        "link": null
+      },
+      {
+        "name": "Азия Микс",
+        "quantity": 75,
+        "link": null
+      },
+      {
+        "name": "Алтайский с Ягодами",
+        "quantity": 100,
+        "link": null
+      },
+      {
+        "name": "Банановый Милкшейк",
+        "quantity": 150,
+        "link": null
+      },
+      {
+        "name": "Вишневая Кола",
+        "quantity": 175,
+        "link": null
+      },
+      {
+        "name": "Грейпфрут",
+        "quantity": 100,
+        "link": null
+      },
+      {
+        "name": "Двойное Яблоко",
+        "quantity": 50,
+        "link": null
+      },
+      {
+        "name": "Елка-Мандарин",
+        "quantity": 25,
+        "link": null
+      },
+      {
+        "name": "Зеленое Яблоко",
+        "quantity": 125,
+        "link": null
+      },
+      {
+        "name": "Земляника",
+        "quantity": 75,
+        "link": null
+      },
+      {
+        "name": "Итальянский Негрони",
+        "quantity": 100,
+        "link": null
+      },
+      {
+        "name": "Киви",
+        "quantity": 50,
+        "link": null
+      },
+      {
+        "name": "Клубничный Мохито",
+        "quantity": 150,
+        "link": null
+      },
+      {
+        "name": "Королевский Лемонад",
+        "quantity": 25,
+        "link": null
+      },
+      {
+        "name": "Красная Смородина",
+        "quantity": 25,
+        "link": null
+      },
+      {
+        "name": "Кремовый Энергетик",
+        "quantity": 25,
+        "link": null
+      },
+      {
+        "name": "Лемонграсс",
+        "quantity": 150,
+        "link": null
+      },
+      {
+        "name": "Лимон-Лайм",
+        "quantity": 150,
+        "link": null
+      },
+      {
+        "name": "Малиновая Рафаэлла",
+        "quantity": 150,
+        "link": null
+      },
+      {
+        "name": "Маракуйя",
+        "quantity": 125,
+        "link": null
+      },
+      {
+        "name": "Мармеладные Мишки",
+        "quantity": 125,
+        "link": null
+      },
+      {
+        "name": "Медовые Ягоды",
+        "quantity": 100,
+        "link": null
+      },
+      {
+        "name": "Мелисса с Ягодами",
+        "quantity": 50,
+        "link": null
+      },
+      {
+        "name": "Освежающий Виноград",
+        "quantity": 75,
+        "link": null
+      },
+      {
+        "name": "Персик-Абрикос",
+        "quantity": 50,
+        "link": null
+      },
+      {
+        "name": "Печеное Яблоко",
+        "quantity": 50,
+        "link": null
+      },
+      {
+        "name": "Пуэр с Вишней",
+        "quantity": 75,
+        "link": null
+      },
+      {
+        "name": "Северная Ягода",
+        "quantity": 75,
+        "link": null
+      }
+    ]
+  },
+  "Satyr": {
+    "whole_packs": [
+      {
+        "name": "Acai",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Bacon",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Burley Cognac",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "California Cola",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Charmer",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Isabel",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Kvas",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Pixie",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Qirim Chacha",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Tyanka",
+        "quantity": 2,
+        "link": null
+      }
+    ],
+    "loose_packs": [
+      {
+        "name": "BOM-BYAO",
+        "quantity": 25,
+        "link": null
+      },
+      {
+        "name": "Burley Cognac",
+        "quantity": 25,
+        "link": null
+      },
+      {
+        "name": "Excalibur",
+        "quantity": 25,
+        "link": null
+      }
+    ]
+  },
+  "Xperience": {
+    "whole_packs": [
+      {
+        "name": "Aloha Ale",
+        "quantity": 5,
+        "link": null
+      },
+      {
+        "name": "Bana-Nascar",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Battle Apple",
+        "quantity": 6,
+        "link": "https://t.me/shisha_danang/1287"
+      },
+      {
+        "name": "Cake Flip",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Easy Freezy",
+        "quantity": 6,
+        "link": "https://t.me/shisha_danang/1284"
+      },
+      {
+        "name": "Granade Arcade",
+        "quantity": 5,
+        "link": null
+      },
+      {
+        "name": "Grape & Furiois",
+        "quantity": 5,
+        "link": null
+      },
+      {
+        "name": "MintSlide",
+        "quantity": 4,
+        "link": null
+      },
+      {
+        "name": "Mohito Yota",
+        "quantity": 5,
+        "link": null
+      },
+      {
+        "name": "Petrol Headz",
+        "quantity": 1,
+        "link": "https://t.me/shisha_danang/1291"
+      },
+      {
+        "name": "PvP Corner",
+        "quantity": 1,
+        "link": "https://t.me/shisha_danang/1292"
+      },
+      {
+        "name": "Resident Kiwi",
+        "quantity": 5,
+        "link": "https://t.me/shisha_danang/1286"
+      },
+      {
+        "name": "Turbo Tea",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/1283"
+      },
+      {
+        "name": "Ultimate Peach",
+        "quantity": 4,
+        "link": "https://t.me/shisha_danang/1288"
+      }
+    ],
+    "loose_packs": []
+  },
+  "Trofimoff's": {
+    "whole_packs": [
+      {
+        "name": "Abricot",
+        "quantity": 3,
+        "link": null
+      },
+      {
+        "name": "Coke",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Green Tea",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Jasminum",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Kiwi",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Mint",
+        "quantity": 4,
+        "link": null
+      },
+      {
+        "name": "Nobilis",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Pan Banan",
+        "quantity": 4,
+        "link": null
+      },
+      {
+        "name": "Ron",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Sri Lanka",
+        "quantity": 3,
+        "link": null
+      },
+      {
+        "name": "Tangerine",
+        "quantity": 3,
+        "link": null
+      },
+      {
+        "name": "Watermelon",
+        "quantity": 4,
+        "link": null
+      },
+      {
+        "name": "Wild Strawberry",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Connecticut",
+        "quantity": 3,
+        "link": null
+      },
+      {
+        "name": "Drama",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Ortica",
+        "quantity": 5,
+        "link": null
+      },
+      {
+        "name": "Shurale",
+        "quantity": 3,
+        "link": null
+      },
+      {
+        "name": "Spirit",
+        "quantity": 3,
+        "link": null
+      },
+      {
+        "name": "Finlandia Vanila",
+        "quantity": 2,
+        "link": null
+      }
+    ],
+    "loose_packs": []
+  },
+  "Overdose": {
+    "whole_packs": [
+      {
+        "name": "Fruittella",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Arome Rum",
+        "quantity": 3,
+        "link": null
+      },
+      {
+        "name": "Bali Mango",
+        "quantity": 3,
+        "link": null
+      },
+      {
+        "name": "Brumblebee",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Currant Black",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Frustyle",
+        "quantity": 1,
+        "link": null
+      },
+      {
+        "name": "Gin Watermelon",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Goa Feijoa",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Maraschino Cherry",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/1298"
+      },
+      {
+        "name": "Masala Tea",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Melon Berry",
+        "quantity": 3,
+        "link": "https://t.me/shisha_danang/1296"
+      },
+      {
+        "name": "Orange Soda",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Strawberry",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Strawberry Kiwi",
+        "quantity": 2,
+        "link": "https://t.me/shisha_danang/1303"
+      },
+      {
+        "name": "Tarhun",
+        "quantity": 3,
+        "link": "https://t.me/shisha_danang/1301"
+      },
+      {
+        "name": "Wild Strawberry",
+        "quantity": 4,
+        "link": "https://t.me/shisha_danang/1302"
+      }
+    ],
+    "loose_packs": []
+  },
+  "Starline": {
+    "whole_packs": [
+      {
+        "name": "Гранатовый Сок",
+        "quantity": 2,
+        "link": null
+      }
+    ],
+    "loose_packs": []
+  },
+  "Энтузиаст": {
+    "whole_packs": [
+      {
+        "name": "Банановый",
+        "quantity": 5,
+        "link": null
+      },
+      {
+        "name": "Голубиковый",
+        "quantity": 3,
+        "link": null
+      },
+      {
+        "name": "Гранатовый",
+        "quantity": 4,
+        "link": null
+      },
+      {
+        "name": "Грушевый",
+        "quantity": 2,
+        "link": null
+      },
+      {
+        "name": "Клюквенный",
+        "quantity": 4,
+        "link": null
+      },
+      {
+        "name": "Коловый",
+        "quantity": 5,
+        "link": null
+      },
+      {
+        "name": "Лакомый",
+        "quantity": 8,
+        "link": null
+      },
+      {
+        "name": "Малиновый",
+        "quantity": 3,
+        "link": null
+      },
+      {
+        "name": "Папайевый",
+        "quantity": 4,
+        "link": null
+      },
+      {
+        "name": "Персиковый",
+        "quantity": 4,
+        "link": null
+      },
+      {
+        "name": "Тропический",
+        "quantity": 6,
+        "link": null
+      },
+      {
+        "name": "Яблоневый",
+        "quantity": 6,
+        "link": null
+      }
+    ],
+    "loose_packs": []
+  }
+}
