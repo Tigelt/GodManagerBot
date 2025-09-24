@@ -11,12 +11,12 @@ API_ID = 14739654
 API_HASH = '98c13db08224026ed85682c5ed3e1834'
 
 # Telegram настройки
-FORUM_CHAT_ID = '@gogoelis'  # ID чата форума для публикации ассортимента
-FORUM_THREAD_ID = 2  # ID ветки форума
+FORUM_CHAT_ID = '@shisha_danang'  # ID чата форума для публикации ассортимента
+FORUM_THREAD_ID = 555  # ID ветки форума
 
 # Канал с описаниями вкусов
-FLAVOR_CHANNEL = '@shisha_danang'
-FLAVOR_THREAD_ID = 16  # ID ветки с описаниями вкусов
+FLAVOR_CHANNEL = '@gogoelis'
+FLAVOR_THREAD_ID = 831  # ID ветки с описаниями вкусов
 
 # Пути к файлам
 DATA_DIR = "requestsMC/data/shisha/"
