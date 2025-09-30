@@ -1,0 +1,824 @@
+"""
+Обработчик команд ассортимента
+"""
+
+import asyncio
+import json
+import re
+import logging
+import aiohttp
+from telegram import Update
+from telegram.ext import ContextTypes
+
+from services.telegram_client import TelegramClientService
+from services.moy_sklad import MoySkladAPI
+
+logger = logging.getLogger(__name__)
+
+class AssortmentHandler:
+    """Обработчик команд ассортимента"""
+    
+    def __init__(self, telegram_client: TelegramClientService, moy_sklad: MoySkladAPI, config: dict):
+        self.telegram_client = telegram_client
+        self.moy_sklad = moy_sklad
+        self.config = config
+    
+    async def handle_assortment_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Обработка команды /assortment"""
+        try:
+            await update.message.reply_text("🔄 Подготавливаю ассортимент...")
+            
+            # Подготавливаем ассортимент
+            final_assortment = await self._prepare_assortment()
+            if not final_assortment:
+                await update.message.reply_text("❌ Не удалось подготовить ассортимент")
+                return
+            
+            await update.message.reply_text("🔄 Публикую ассортимент, пожалуйста ожидайте...")
+            
+            # Публикуем ассортимент
+            await self._publish_assortment(final_assortment)
+            
+            await update.message.reply_text("✅ Ассортимент успешно добавлен!")
+            
+        except Exception as e:
+            logger.error(f"❌ Ошибка обработки команды /assortment: {e}")
+            await update.message.reply_text("❌ Ошибка публикации ассортимента")
+    
+    async def handle_update_assortment_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Обработка команды /updateassortment"""
+        try:
+            await update.message.reply_text("🔄 Обновляю ассортимент...")
+            
+            # Сначала обновляем данные из Мой Склад
+            await self._prepare_assortment()
+            
+            # Потом обновляем сообщения в форуме
+            await self._update_assortment()
+            
+            await update.message.reply_text("✅ Ассортимент успешно обновлен!")
+            
+        except Exception as e:
+            logger.error(f"❌ Ошибка обработки команды /updateassortment: {e}")
+            await update.message.reply_text("❌ Ошибка обновления ассортимента")
+    
+    async def handle_base_flavor_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Обработка команды /baseflavor - обновляет описания вкусов из Telegram канала"""
+        try:
+            print("🔄 Обновляю описания вкусов...")
+            await update.message.reply_text("🔄 Обновляю описания вкусов...")
+            
+            # Получаем информацию о канале с описаниями
+            entity = await self.telegram_client.get_entity(self.config['flavor_channel'])
+            print(f"🔍 Парсю ветку с описаниями: {entity.title} (Thread ID: {self.config['flavor_thread_id']})")
+            logger.info(f"🔍 Парсю ветку с описаниями: {entity.title} (Thread ID: {self.config['flavor_thread_id']})")
+            
+            # Получаем все сообщения в ветке с описаниями
+            messages = []
+            async for message in self.telegram_client.iter_messages(
+                entity, 
+                reply_to=self.config['flavor_thread_id'], 
+                limit=None
+            ):
+                if message.text:  # Только сообщения с текстом
+                    messages.append(message)
+            
+            print(f"📋 Найдено {len(messages)} сообщений с описаниями")
+            logger.info(f"📋 Найдено {len(messages)} сообщений с описаниями")
+            
+            # Создаем структуру для хранения описаний вкусов
+            flavor_descriptions = {}
+            
+            # Бренды из конфига
+            actual_brands = self.config['actual_brands']
+            
+            # Идем по массиву актуальных брендов
+            for brand in actual_brands:
+                logger.info(f"🔍 Ищу сообщения для бренда: {brand}")
+                
+                # Создаем хештег для поиска (в нижнем регистре, убираем пробелы, апострофы и 's')
+                hashtag = f"#{brand.lower().replace(' ', '').replace(chr(39), '')}"
+                
+                # Ищем сообщения с этим хештегом
+                brand_messages = []
+                for message in messages:
+                    if message.text and hashtag in message.text.lower():
+                        brand_messages.append(message)
+                
+                print(f"📝 Найдено {len(brand_messages)} сообщений для {brand}")
+                logger.info(f"📝 Найдено {len(brand_messages)} сообщений для {brand}")
+                
+                # Обрабатываем найденные сообщения
+                if brand_messages:
+                    flavor_descriptions[brand] = {}
+                    
+                    for message in brand_messages:
+                        # Берем первую строку как название вкуса и убираем звездочки
+                        lines = message.text.strip().split('\n')
+                        if lines:
+                            flavor_name = lines[0].strip().replace('**', '')
+                            
+                            # Создаем ссылку на сообщение
+                            message_link = f"https://t.me/{entity.username}/{message.id}"
+                            
+                            # Добавляем в структуру
+                            flavor_descriptions[brand][flavor_name] = message_link
+                            logger.info(f"  ✅ {flavor_name} → {message_link}")
+                
+                # Если не нашли сообщения для бренда, создаем пустую секцию
+                if brand not in flavor_descriptions:
+                    flavor_descriptions[brand] = {}
+                    print(f"  ⚠️ Не найдено сообщений для {brand}")
+                    logger.info(f"  ⚠️ Не найдено сообщений для {brand}")
+            
+            # Убираем секцию "Остальные" - нам нужны только бренды из массива
+            
+            print(f"📊 Всего обработано брендов: {len(flavor_descriptions)}")
+            logger.info(f"📊 Всего обработано брендов: {len(flavor_descriptions)}")
+            
+            # Сохраняем результат в JSON файл
+            output_file = self.config['flavor_descriptions_file']
+            with open(output_file, "w", encoding="utf-8") as f:
+                json.dump(flavor_descriptions, f, ensure_ascii=False, indent=2)
+            
+            print(f"✅ Описания вкусов сохранены в {output_file}")
+            logger.info(f"✅ Описания вкусов сохранены в {output_file}")
+            
+            # Отправляем результат в чат
+            total_flavors = sum(len(flavors) for flavors in flavor_descriptions.values())
+            result_message = f"✅ Обновление описаний вкусов завершено!\n\n"
+            result_message += f"📊 Статистика:\n"
+            result_message += f"• Брендов: {len(flavor_descriptions)}\n"
+            result_message += f"• Всего вкусов: {total_flavors}\n\n"
+            
+            for brand, flavors in flavor_descriptions.items():
+                if flavors:
+                    result_message += f"• {brand}: {len(flavors)} вкусов\n"
+            
+            await update.message.reply_text(result_message)
+            
+        except Exception as e:
+            logger.error(f"❌ Ошибка обработки команды /baseflavor: {e}")
+            await update.message.reply_text(f"❌ Ошибка обновления описаний вкусов: {str(e)}")
+    
+    async def handle_inventory_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Обработка команды /inventory - показывает инвентарь табаков"""
+        try:
+            await update.message.reply_text("🔄 Загружаю инвентарь...")
+            
+            # Подготавливаем ассортимент (как в _publish_assortment)
+            final_assortment = await self._prepare_assortment()
+            if not final_assortment:
+                await update.message.reply_text("❌ Не удалось подготовить ассортимент")
+                return
+            
+            # Отправляем каждый бренд отдельным сообщением (как в _publish_assortment)
+            for brand_name, brand_data in final_assortment.items():
+                whole_packs = brand_data.get("whole_packs", [])
+                loose_packs = brand_data.get("loose_packs", [])
+                
+                if whole_packs or loose_packs:
+                    # Формируем сообщение для бренда (как в _format_brand_message)
+                    message = self._format_inventory_message(brand_name, whole_packs, loose_packs)
+                    
+                    # Отправляем в чат с ботом
+                    await update.message.reply_text(message)
+                    
+                    # Задержка между сообщениями
+                    await asyncio.sleep(1)
+            
+            await update.message.reply_text("✅ Инвентарь загружен!")
+            
+        except Exception as e:
+            logger.error(f"❌ Ошибка обработки команды /inventory: {e}")
+            await update.message.reply_text("❌ Ошибка загрузки инвентаря")
+    
+    async def _prepare_assortment(self):
+        """Подготавливает ассортимент - тянет остатки со склада и создает FinalAssortment"""
+        try:
+            print("🔄 Начинаю подготовку ассортимента...")
+            logger.info("🔄 Начинаю подготовку ассортимента...")
+            
+            # Получаем остатки со склада
+            print("📦 Получаю остатки со склада...")
+            stock_data = await self._get_stock_data()
+            if not stock_data:
+                print("❌ Не удалось получить остатки")
+                logger.error("❌ Не удалось получить остатки")
+                return None
+            
+            print("✅ Остатки получены успешно")
+            logger.info("✅ Остатки получены успешно")
+            
+            # Загружаем словарь название → href
+            print("📚 Загружаю словарь товаров...")
+            name_href_file = self.config['item_name_href_file']
+            try:
+                with open(name_href_file, "r", encoding="utf-8") as f:
+                    name_to_href = json.load(f)
+                print(f"✅ Загружено {len(name_to_href)} товаров из словаря")
+            except Exception as e:
+                print(f"❌ Не удалось загрузить ItemNameHref.json: {e}")
+                logger.error(f"❌ Не удалось загрузить ItemNameHref.json: {e}")
+                return None
+            
+            # Создаем обратный словарь href → название
+            href_to_name = {href: name for name, href in name_to_href.items()}
+            logger.info(f"📚 Загружено {len(href_to_name)} товаров из словаря")
+            
+            # Загружаем описания вкусов
+            flavor_descriptions_file = self.config['flavor_descriptions_file']
+            flavor_descriptions = {}
+            try:
+                with open(flavor_descriptions_file, "r", encoding="utf-8") as f:
+                    flavor_descriptions = json.load(f)
+                logger.info(f"📚 Загружено описаний вкусов для {len(flavor_descriptions)} брендов")
+            except Exception as e:
+                logger.warning(f"⚠️ Не удалось загрузить описания вкусов: {e}")
+            
+            # Создаем финальный ассортимент как словарь
+            final_assortment = {}
+            
+            # Идем по массиву актуальных брендов
+            for brand in self.config['actual_brands']:
+                logger.info(f"🔍 Обрабатываю бренд: {brand}")
+                
+                # Создаем структуру для бренда
+                brand_data = {
+                    "whole_packs": [],
+                    "loose_packs": []
+                }
+                
+                # Идем по остаткам со склада
+                if "rows" in stock_data:
+                    for item in stock_data["rows"]:
+                        # Получаем href товара
+                        item_href = self._get_item_href(item)
+                        
+                        # Получаем доступное количество
+                        available = self._get_available_quantity(item)
+                        
+                        # Если товар есть в словаре и количество > 0
+                        if item_href in href_to_name and available > 0:
+                            item_name = href_to_name[item_href]
+                            
+                            # Проверяем, принадлежит ли товар этому бренду
+                            if self._is_item_belongs_to_brand(item_name, brand):
+                                # Очищаем название от бренда и веса
+                                clean_name = self._clean_item_name(item_name, brand)
+                                
+                                # Ищем ссылку на описание вкуса
+                                flavor_link = self._find_flavor_link(brand, clean_name, flavor_descriptions)
+                                
+                                # Проверяем, заканчивается ли на "1г"
+                                if item_name.endswith("1г") or item_name.endswith("(1г)"):
+                                    # Наразвес - округляем до кратного 25
+                                    rounded_quantity = self._round_to_nearest_25(available)
+                                    if rounded_quantity >= 25:  # Показываем только если >= 25г
+                                        # Создаем объект вкуса для loose_packs
+                                        flavor_data = {
+                                            "name": clean_name,
+                                            "quantity": rounded_quantity,
+                                            "link": flavor_link
+                                        }
+                                        brand_data["loose_packs"].append(flavor_data)
+                                        link_info = f" (ссылка: {flavor_link})" if flavor_link else " (без ссылки)"
+                                        logger.info(f"  📦 Наразвес: {clean_name} - {available}г → {rounded_quantity}г{link_info}")
+                                    else:
+                                        logger.info(f"  📦 Наразвес: {clean_name} - {available}г → не показываем (< 25г)")
+                                else:
+                                    # Целые пачки
+                                    # Создаем объект вкуса для whole_packs
+                                    flavor_data = {
+                                        "name": clean_name,
+                                        "quantity": available,
+                                        "link": flavor_link
+                                    }
+                                    brand_data["whole_packs"].append(flavor_data)
+                                    link_info = f" (ссылка: {flavor_link})" if flavor_link else " (без ссылки)"
+                                    logger.info(f"  📦 Целая пачка: {clean_name} - {available}{link_info}")
+                
+                # Добавляем бренд в финальный ассортимент, если есть товары
+                if brand_data["whole_packs"] or brand_data["loose_packs"]:
+                    final_assortment[brand] = brand_data
+                    whole_count = len(brand_data["whole_packs"])
+                    loose_count = len(brand_data["loose_packs"])
+                    logger.info(f"✅ Бренд {brand}: {whole_count} целых пачек, {loose_count} наразвес")
+            
+            # Сохраняем финальный ассортимент
+            final_file = self.config['final_assortment_file']
+            with open(final_file, "w", encoding="utf-8") as f:
+                json.dump(final_assortment, f, ensure_ascii=False, indent=2)
+            
+            logger.info(f"✅ Финальный ассортимент сохранен в {final_file}")
+            logger.info(f"📊 Обработано брендов: {len(final_assortment)}")
+            
+            return final_assortment
+            
+        except Exception as e:
+            logger.error(f"❌ Ошибка подготовки ассортимента: {e}")
+            return None
+    
+    async def _get_stock_data(self):
+        """Получает остатки со склада асинхронно"""
+        try:
+            logger.info("🔄 Получаю остатки со склада...")
+            
+            # URL для получения остатков по складам
+            url = "https://api.moysklad.ru/api/remap/1.2/report/stock/bystore"
+            
+            # Фильтр по нашему складу (TODO: добавить в конфиг)
+            store_href = "https://api.moysklad.ru/api/remap/1.2/entity/store/5b0a00a8-3b99-11f0-0a80-09fd0007829f"
+            params = {
+                "filter": f"store={store_href}"
+            }
+            
+            logger.info(f"🔍 Запрашиваю остатки по складу: {store_href}")
+            
+            # Делаем асинхронный запрос к API
+            async with aiohttp.ClientSession() as session:
+                headers = {
+                    'Authorization': f'Bearer {self.config["moy_sklad_token"]}',
+                    'Content-Type': 'application/json'
+                }
+                async with session.get(url, headers=headers, params=params) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        logger.info(f"✅ Получено {data['meta']['size']} товаров с остатками")
+                        
+                        # Сохраняем сырые данные остатков
+                        stock_file = self.config['stock_data_file']
+                        with open(stock_file, "w", encoding="utf-8") as f:
+                            json.dump(data, f, ensure_ascii=False, indent=2)
+                        
+                        logger.info(f"💾 Остатки сохранены в {stock_file}")
+                        return data
+                    else:
+                        error_text = await response.text()
+                        logger.error(f"❌ Ошибка API: {response.status} - {error_text}")
+                        return None
+                        
+        except Exception as e:
+            logger.error(f"❌ Ошибка получения остатков: {e}")
+            return None
+    
+    def _get_available_quantity(self, item):
+        """Вычисляет доступное количество (остаток - резерв)"""
+        available = 0
+        if "stockByStore" in item:
+            for store_stock in item["stockByStore"]:
+                stock = store_stock.get("stock", 0)
+                reserve = store_stock.get("reserve", 0)
+                available += (stock - reserve)
+        return int(available)
+    
+    def _get_item_href(self, item):
+        """Получает чистый href товара без параметров"""
+        item_href = item.get("meta", {}).get("href", "")
+        
+        # Убираем параметры из href (всё после ?)
+        if "?" in item_href:
+            item_href = item_href.split("?")[0]
+        
+        return item_href
+    
+    def _is_item_belongs_to_brand(self, item_name, brand):
+        """Проверяет, принадлежит ли товар указанному бренду"""
+        item_lower = item_name.lower()
+        brand_lower = brand.lower()
+        
+        # СПЕЦИАЛЬНЫЕ СЛУЧАИ - проверяем сначала более специфичные бренды
+        if brand == "Darkside Xperience":
+            # Для Xperience ищем только товары с "xperience" или "darkside xperience"
+            return "xperience" in item_lower or "darkside xperience" in item_lower
+        elif brand == "Darkside":
+            # Для обычного Darkside исключаем товары с "xperience"
+            if "xperience" in item_lower:
+                return False
+            return "darkside" in item_lower
+        elif brand == "DS shot":
+            # Для DS shot ищем только товары с "ds shot"
+            return "ds shot" in item_lower
+        elif brand == "Blackburn":
+            # Для Blackburn ищем только товары с "blackburn"
+            return "blackburn" in item_lower
+        elif brand == "Overdose":
+            # Для Overdose ищем только товары с "overdose", но исключаем "blackburn ovd"
+            if "blackburn" in item_lower:
+                return False
+            return "overdose" in item_lower
+        
+        # Обычная логика для остальных брендов
+        brand_variants = [
+            brand_lower,
+            brand_lower.replace(" ", ""),
+            brand_lower.replace(" ", "_"),
+            brand_lower.replace(" ", "-")
+        ]
+        
+        # Проверяем, содержит ли название товара любой из вариантов бренда
+        return any(variant in item_lower for variant in brand_variants)
+    
+    def _clean_item_name(self, item_name, brand):
+        """Очищает название товара от бренда и веса"""
+        clean_name = item_name
+        
+        # Специальная логика для DS Shot
+        if brand == "DS shot":
+            # Убираем "DS Shot" из начала названия
+            clean_name = re.sub(r'^DS\s+Shot\s+', '', clean_name, flags=re.IGNORECASE)
+        elif brand == "Xperience":
+            # Убираем "Darkside Xperience" из начала названия
+            clean_name = re.sub(r'^Darkside\s+Xperience\s+', '', clean_name, flags=re.IGNORECASE)
+        else:
+            # Обычная логика для других брендов
+            brand_variants = [brand, brand.replace(" ", ""), brand.replace(" ", "_")]
+            for variant in brand_variants:
+                if variant.lower() in clean_name.lower():
+                    clean_name = clean_name.replace(variant, "").strip()
+                    break
+        
+        # Убираем вес в скобках
+        clean_name = re.sub(r'\s*\(\d+г\)', '', clean_name)
+        clean_name = re.sub(r'\s*\d+г', '', clean_name)
+        clean_name = re.sub(r'\s*\(1г\)', '', clean_name)
+        clean_name = re.sub(r'\s*1г', '', clean_name)
+        
+        return clean_name.strip()
+    
+    def _round_to_nearest_25(self, quantity):
+        """Округляет количество до ближайшего кратного 25 (в меньшую сторону)"""
+        if quantity < 25:
+            return 0
+        
+        # Округляем в меньшую сторону до кратного 25
+        return (quantity // 25) * 25
+    
+    def _find_flavor_link(self, brand_name, flavor_name, flavor_descriptions):
+        """Ищет ссылку на описание вкуса - ТОЧНОЕ СОВПАДЕНИЕ В НИЖНЕМ РЕГИСТРЕ"""
+        if brand_name in flavor_descriptions:
+            brand_flavors = flavor_descriptions[brand_name]
+            
+            # Точное совпадение в нижнем регистре
+            flavor_name_lower = flavor_name.lower()
+            for desc_flavor_name, link in brand_flavors.items():
+                if desc_flavor_name.lower() == flavor_name_lower:
+                    return link
+                    
+        return None
+    
+    async def _publish_assortment(self, final_assortment):
+        """Публикация ассортимента в форум"""
+        try:
+            print(f"📤 Публикую ассортимент: {len(final_assortment)} брендов")
+            
+            # Сначала очищаем форум (оставляем только главное сообщение)
+            main_message_id = await self._clear_forum_except_oldest()
+            
+            # Словарь для хранения ссылок на бренды
+            brand_links = {}
+            
+            # Отправляем каждый бренд отдельным сообщением
+            for brand_name, brand_data in final_assortment.items():
+                whole_packs = brand_data.get("whole_packs", [])
+                loose_packs = brand_data.get("loose_packs", [])
+                
+                if whole_packs or loose_packs:
+                    # Формируем сообщение для бренда
+                    message = self._format_brand_message(brand_name, whole_packs, loose_packs)
+                    
+                    # Отправляем в форум через Telethon
+                    try:
+                        sent_message = await self.telegram_client.send_message(
+                            chat_id=self.config['forum_chat_id'],
+                            message=message,
+                            thread_id=self.config['forum_thread_id']
+                        )
+                        print(f"✅ Отправлен в форум: {brand_name} ({len(whole_packs) + len(loose_packs)} товаров)")
+                        
+                        # Создаем ссылку на сообщение
+                        entity = await self.telegram_client.get_entity(self.config['forum_chat_id'])
+                        chat_id_numeric = entity.id
+                        message_link = f"https://t.me/c/{chat_id_numeric}/{sent_message.id}"
+                        brand_links[brand_name] = message_link
+                        
+                        # Задержка между сообщениями
+                        import asyncio
+                        await asyncio.sleep(4)
+                        
+                    except Exception as forum_error:
+                        print(f"❌ Ошибка отправки в форум: {forum_error}")
+            
+            # Выводим все собранные ссылки
+            print(f"\n📋 ДИНАМИЧЕСКИЙ СЛОВАРИК ССЫЛОК:")
+            for brand, link in brand_links.items():
+                print(f"   {brand}: {link}")
+            
+            # Обновляем главное сообщение с гиперссылками
+            if self.config['forum_chat_id'] and brand_links and main_message_id:
+                await self._update_main_message_with_links(main_message_id, brand_links)
+            
+            print(f"🎉 Публикация завершена!")
+            
+        except Exception as e:
+            print(f"❌ Ошибка публикации ассортимента: {e}")
+            raise e
+    
+    def _format_brand_message(self, brand_name, whole_packs, loose_packs):
+        """Форматирование сообщения для бренда"""
+        # Заголовок с квадратиками по бокам и жирным названием бренда заглавными буквами
+        message = f"▪️▪️▪️**{brand_name.upper()}**▪️▪️▪️\n\n"
+        
+        # Сначала выводим целые баночки
+        for flavor in whole_packs:
+            name = flavor.get("name", "")
+            quantity = flavor.get("quantity", 0)
+            link = flavor.get("link")
+            
+            # Ограничиваем количество до 3+
+            display_quantity = "3+" if quantity > 3 else str(quantity)
+            
+            if link:
+                # Добавляем гиперссылку
+                message += f"[{name}]({link}) {display_quantity}\n"
+            else:
+                # Без гиперссылки, обычное название
+                message += f"{name} {display_quantity}\n"
+        
+        # Добавляем разделитель и вскрытые вкусы, если есть
+        if loose_packs:
+            message += "\n---\n**Вскрытые вкусы:**\n"
+            
+            for flavor in loose_packs:
+                name = flavor.get("name", "")
+                quantity = flavor.get("quantity", 0)
+                link = flavor.get("link")
+                
+                if link:
+                    # Добавляем гиперссылку с количеством грамм
+                    message += f"[{name}]({link}) {quantity}г\n"
+                else:
+                    # Без гиперссылки, обычное название с количеством грамм
+                    message += f"{name} {quantity}г\n"
+        
+        return message
+    
+    def _format_inventory_message(self, brand_name, whole_packs, loose_packs):
+        """Форматирование сообщения для инвентаря - только целые пачки"""
+        # Заголовок с квадратиками по бокам и жирным названием бренда заглавными буквами
+        message = f"▪️▪️▪️{brand_name.upper()}▪️▪️▪️\n\n"
+        
+        # Показываем только целые пачки
+        total_quantity = 0
+        for flavor in whole_packs:
+            name = flavor.get("name", "")
+            quantity = flavor.get("quantity", 0)
+            total_quantity += quantity
+            
+            # Показываем точное количество
+            message += f"{name} {quantity}\n"
+        
+        # Добавляем суммарное количество в конце
+        if total_quantity > 0:
+            message += f"\nВсего: {total_quantity} шт"
+        
+        return message
+    
+    async def _clear_forum_except_oldest(self):
+        """Очищает форум, оставляя только самое старое сообщение"""
+        try:
+            # Получаем все сообщения в форуме
+            messages = []
+            async for message in self.telegram_client.iter_messages(
+                self.config['forum_chat_id'], 
+                reply_to=self.config['forum_thread_id'], 
+                limit=None
+            ):
+                messages.append(message)
+            
+            print(f"📋 ВСЕ СООБЩЕНИЯ В ФОРУМЕ ({len(messages)} шт.):")
+            for i, message in enumerate(messages):
+                text_preview = message.text[:50] if message.text else "Нет текста"
+                print(f"   {i}: ID {message.id} | Дата: {message.date} | Текст: {text_preview}...")
+            
+            if len(messages) <= 1:
+                print("✅ В форуме только одно сообщение, очистка не нужна")
+                return None
+            
+            # Находим главное сообщение (с текстом, самое старое)
+            main_messages = [m for m in messages if m.text and len(m.text) > 10]
+            if not main_messages:
+                print("❌ Не найдено главное сообщение с текстом!")
+                return None
+            
+            main_message = min(main_messages, key=lambda m: m.date)
+            print(f"📌 Главное сообщение: ID {main_message.id} | Дата: {main_message.date}")
+            
+            # Удаляем все сообщения кроме главного
+            deleted_count = 0
+            for message in messages:
+                if message.id == main_message.id:  # Пропускаем главное сообщение
+                    print(f"⏭️ Пропускаем главное сообщение ID {message.id}")
+                    continue
+                
+                try:
+                    await self.telegram_client.delete_message(
+                        chat_id=self.config['forum_chat_id'],
+                        message_id=message.id
+                    )
+                    deleted_count += 1
+                    print(f"🗑️ Удалено сообщение ID {message.id}")
+                except Exception as e:
+                    print(f"❌ Не удалось удалить сообщение ID {message.id}: {e}")
+            
+            print(f"✅ Очистка завершена! Удалено {deleted_count} сообщений")
+            return main_message.id
+            
+        except Exception as e:
+            print(f"❌ Ошибка очистки форума: {e}")
+            return None
+    
+    async def _update_main_message_with_links(self, main_message_id, brand_links):
+        """Обновляет главное сообщение, добавляя гиперссылки к названиям брендов"""
+        try:
+            # Получаем главное сообщение
+            main_message = await self.telegram_client.get_message(
+                chat_id=self.config['forum_chat_id'],
+                message_id=main_message_id
+            )
+            
+            if not main_message:
+                print(f"❌ Не удалось получить главное сообщение ID {main_message_id}")
+                return
+            
+            current_text = main_message.text
+            print(f"📝 Текущий текст главного сообщения: {current_text[:100]}...")
+            
+            # Удаляем все старые гиперссылки
+            import re
+            updated_text = current_text
+            
+            # Удаляем жирный текст **
+            updated_text = re.sub(r'\*\*', '', updated_text)
+            print("🧹 Удален жирный текст **")
+            
+            # Удаляем все гиперссылки в формате [текст](ссылка)
+            updated_text = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', updated_text)
+            print("🧹 Удалены все старые гиперссылки")
+            
+            # Добавляем новые гиперссылки
+            # Сортируем по длине названия (от длинного к короткому)
+            sorted_brands = sorted(brand_links.items(), key=lambda x: len(x[0]), reverse=True)
+            
+            for brand_name, link in sorted_brands:
+                # Создаем гиперссылку в формате Markdown
+                hyperlink = f"[{brand_name}]({link})"
+                
+                # Заменяем в тексте
+                if brand_name in updated_text:
+                    updated_text = updated_text.replace(brand_name, hyperlink)
+                    print(f"🔗 Заменено '{brand_name}' на гиперссылку")
+                else:
+                    print(f"⚠️ Не найдено '{brand_name}' в тексте")
+            
+            # Восстанавливаем жирный текст в начале и конце
+            if not updated_text.startswith('**'):
+                updated_text = '**' + updated_text
+            if not updated_text.endswith('**'):
+                updated_text = updated_text + '**'
+            
+            # Отправляем обновленное сообщение
+            await self.telegram_client.edit_message(
+                chat_id=self.config['forum_chat_id'],
+                message_id=main_message_id,
+                text=updated_text
+            )
+            print(f"✅ Главное сообщение обновлено с гиперссылками!")
+            
+        except Exception as e:
+            print(f"❌ Ошибка обновления главного сообщения: {e}")
+    
+    async def _update_assortment(self):
+        """Обновляет содержимое существующих сообщений с ассортиментом (после отгрузки)"""
+        try:
+            print("🔄 Начинаю обновление ассортимента...")
+            
+            # Загружаем финальный ассортимент
+            final_file = self.config['final_assortment_file']
+            try:
+                with open(final_file, "r", encoding="utf-8") as f:
+                    assortment_data = json.load(f)
+                print(f"📦 Загружен СВЕЖИЙ ассортимент: {len(assortment_data)} брендов")
+            except FileNotFoundError:
+                print("❌ Файл ассортимента не найден!")
+                return
+            
+            # Загружаем описания вкусов с ссылками
+            flavor_descriptions_file = self.config['flavor_descriptions_file']
+            flavor_descriptions = {}
+            try:
+                with open(flavor_descriptions_file, "r", encoding="utf-8") as f:
+                    flavor_descriptions = json.load(f)
+                print(f"📚 Загружены описания вкусов: {len(flavor_descriptions)} брендов")
+            except FileNotFoundError:
+                print("⚠️ Файл описаний вкусов не найден, гиперссылки не будут добавлены")
+            
+            # Получаем все сообщения в форуме
+            messages = []
+            async for message in self.telegram_client.iter_messages(
+                self.config['forum_chat_id'], 
+                reply_to=self.config['forum_thread_id'], 
+                limit=None
+            ):
+                if message.text:  # Только сообщения с текстом
+                    messages.append(message)
+            
+            print(f"📋 Найдено {len(messages)} сообщений в форуме")
+            
+            # Сортируем сообщения по дате (от старых к новым)
+            messages.sort(key=lambda x: x.date)
+            
+            # Пропускаем первое сообщение (главное) - оно не изменяется
+            brand_messages = messages[1:]  # Сообщения с брендами
+            
+            print(f"📝 Будем обновлять {len(brand_messages)} сообщений с брендами")
+            
+            # Обновляем каждое сообщение с брендом
+            for i, (brand_name, brand_data) in enumerate(assortment_data.items()):
+                if i >= len(brand_messages):
+                    print(f"⚠️ Недостаточно сообщений для бренда {i+1}")
+                    break
+                    
+                whole_packs = brand_data.get("whole_packs", [])
+                loose_packs = brand_data.get("loose_packs", [])
+                
+                # Проверяем что есть товары для отображения
+                if whole_packs or loose_packs:
+                    # Формируем новое сообщение для бренда с гиперссылками
+                    new_message = self._format_brand_message(brand_name, whole_packs, loose_packs)
+                    
+                    # Получаем сообщение для обновления
+                    message_to_update = brand_messages[i]
+                    
+                    # Показываем детали изменений
+                    whole_packs_count = len(whole_packs)
+                    loose_packs_count = len(loose_packs)
+                    
+                    print(f"📝 ДЕТАЛИ ИЗМЕНЕНИЙ для {brand_name}:")
+                    print(f"   Целые пачки: {whole_packs_count} товаров")
+                    print(f"   Наразвес: {loose_packs_count} товаров")
+                    
+                    try:
+                        # Обновляем сообщение
+                        await self.telegram_client.edit_message(
+                            chat_id=self.config['forum_chat_id'],
+                            message_id=message_to_update.id,
+                            text=new_message
+                        )
+                        
+                        print(f"✅ Обновлено сообщение {i+1}: {brand_name} ({whole_packs_count + loose_packs_count} товаров)")
+                        
+                        # Задержка между обновлениями
+                        import asyncio
+                        await asyncio.sleep(5)
+                        
+                    except Exception as e:
+                        error_msg = str(e)
+                        if "Content of the message was not modified" in error_msg:
+                            print(f"ℹ️ Сообщение {i+1}: {brand_name} - без изменений")
+                        else:
+                            print(f"❌ Ошибка обновления сообщения {i+1}: {e}")
+            
+            print("🎉 Обновление ассортимента завершено!")
+            
+            # Обновляем главное сообщение с гиперссылками
+            if messages and len(messages) > 0:
+                main_message_id = messages[0].id  # Первое сообщение - главное
+                print(f"🔍 Главное сообщение ID: {main_message_id}")
+                
+                # Собираем ссылки на бренды из существующих сообщений форума
+                brand_links = {}
+                print(f"🔍 Ищу ссылки для {len(assortment_data)} брендов в {len(brand_messages)} сообщениях")
+                
+                # Получаем entity для создания ссылок
+                entity = await self.telegram_client.get_entity(self.config['forum_chat_id'])
+                chat_id_numeric = entity.id
+                
+                for i, (brand_name, brand_data) in enumerate(assortment_data.items()):
+                    if i < len(brand_messages):
+                        message = brand_messages[i]
+                        # Создаем ссылку на сообщение
+                        message_link = f"https://t.me/c/{chat_id_numeric}/{message.id}"
+                        brand_links[brand_name] = message_link
+                        print(f"🔍 Бренд '{brand_name}': ссылка = {message_link}")
+                
+                print(f"🔍 Найдено {len(brand_links)} ссылок: {list(brand_links.keys())}")
+                if brand_links:
+                    await self._update_main_message_with_links(main_message_id, brand_links)
+                    print("🔗 Главное сообщение обновлено с гиперссылками!")
+                else:
+                    print("⚠️ Ссылки не найдены, главное сообщение не обновляется")
+            
+        except Exception as e:
+            print(f"❌ Критическая ошибка обновления ассортимента: {e}")
+            raise e
