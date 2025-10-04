@@ -9,7 +9,6 @@ services:
       - .env
     volumes:
       - ./data:/app/data
-      - ./botAccount.session:/app/botAccount.session
     environment:
       - PYTHONPATH=/app
     command: python -u main.py
