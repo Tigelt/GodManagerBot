@@ -5,10 +5,10 @@ prepare_bot() {
     echo "🚀 Подготовка GodManagerBot..."
     
     echo "🔐 Шаг 1: Создание сессии Telegram..."
-    python3 utils/auth.py
+    docker-compose run --rm godmanagerbot python utils/auth.py
     
     echo "📦 Шаг 2: Обновление списка товаров..."
-    python3 -c "
+    docker-compose run --rm godmanagerbot python -c "
 import asyncio
 import sys
 import os
