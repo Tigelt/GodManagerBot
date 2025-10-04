@@ -8,8 +8,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 load_dotenv()
 
-api_id = int(os.getenv('TELEGRAM_API_ID'))
-api_hash = os.getenv('TELEGRAM_API_HASH')
+api_id = int(os.getenv('TELEGRAM_API_ID', '0'))
+api_hash = os.getenv('TELEGRAM_API_HASH', '')
 
 session_file = 'botAccount.session'
 
