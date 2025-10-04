@@ -8,7 +8,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./data:/app/data
+      - ./data:/app/data:rw
     environment:
       - PYTHONPATH=/app
     command: python -u main.py
