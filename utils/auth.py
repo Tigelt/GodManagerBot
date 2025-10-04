@@ -14,6 +14,10 @@ api_hash = os.getenv('TELEGRAM_API_HASH', '')
 session_file = 'botAccount.session'
 
 # Проверяем существование файла сессии
+print(f"🔍 Проверяем файл {session_file}...")
+print(f"🔍 Путь: {os.path.abspath(session_file)}")
+print(f"🔍 Существует: {os.path.exists(session_file)}")
+
 if os.path.exists(session_file):
     print(f"✅ Файл {session_file} уже существует, ничего не делаем")
 else:
