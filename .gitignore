@@ -64,14 +64,22 @@ logs/
 *.tmp
 *.temp
 
-# Data files with sensitive info
-data/StockData.json
-data/FinalAssortment.json
-data/FlavorDescriptions.json
-data/ItemNameHref.json
-data/AgentNameHref.json
+# Data files (all files in data directory)
+data/*.json
+data/*.txt
+data/*.csv
+data/*.xlsx
+data/*.xls
 
-# Credentials
+# Session files (all session files)
+*.session
+botAccount.session
+aimanager.session
+personal_dialogs.ndjson
+
+# Credentials and sensitive files
 *.json
 !package.json
 !package-lock.json
+!docker-compose.yml
+!Dockerfile

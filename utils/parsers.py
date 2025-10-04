@@ -85,10 +85,11 @@ async def parse_order_message(text: str) -> Dict[str, Any]:
         
         # Определяем накладные расходы (как в старом проекте)
         overheads = 0
-        if abs((total - manual_sum - delivery_cost)) == delivery_cost:
+        # Накладные = доставка, только если сумма товаров + доставка = указанная сумма
+        if manual_sum - delivery_cost < total:
             overheads = delivery_cost
         
-        return {
+        result = {
             'username': username,
             'payment_method': payment_method,
             'manual_sum': manual_sum,
@@ -98,6 +99,21 @@ async def parse_order_message(text: str) -> Dict[str, Any]:
             'overheads': overheads,
             'items': items
         }
+        
+        print("🔍 DEBUG PARSER - ВСЕ ДАННЫЕ:")
+        print(f"  username: {username}")
+        print(f"  payment_method: {payment_method}")
+        print(f"  manual_sum: {manual_sum}")
+        print(f"  delivery_cost: {delivery_cost}")
+        print(f"  comment: {comment}")
+        print(f"  total: {total}")
+        print(f"  overheads: {overheads}")
+        print(f"  items: {items}")
+        print(f"  РАСЧЕТ: total({total}) != manual_sum({manual_sum}) = {total != manual_sum}")
+        print(f"  РЕЗУЛЬТАТ: overheads = {overheads}")
+        print("=" * 60)
+        
+        return result
         
     except Exception as e:
         logger.error(f"Ошибка парсинга сообщения: {e}")

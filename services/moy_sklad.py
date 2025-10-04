@@ -151,7 +151,7 @@ class MoySkladAPI:
                     result = await response.json()
                     # Получаем полное имя клиента
                     name = result.get('name', 'Не указано')
-                    logger.info(f"✅ Агент получен: {name}")
+                    
                     return name
                 else:
                     logger.error(f"❌ Ошибка получения агента: {response.status}")
@@ -209,7 +209,7 @@ class MoySkladAPI:
             async with session.post(url, json=demand_data, headers=self.headers) as response:
                 if response.status == 200:
                     result = await response.json()
-                    logger.info("✅ Отгрузка создана")
+                    
                     return result
                 else:
                     error_text = await response.text()

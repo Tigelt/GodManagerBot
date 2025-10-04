@@ -16,11 +16,12 @@ logger = logging.getLogger(__name__)
 class OrderHandler:
     """Обработчик событий"""
     
-    def __init__(self, moy_sklad: MoySkladAPI, google_sheets: GoogleSheetsService, telegram_client, config: dict):
+    def __init__(self, moy_sklad: MoySkladAPI, google_sheets: GoogleSheetsService, telegram_client, config: dict, assortment_handler=None):
         self.moy_sklad = moy_sklad
         self.google_sheets = google_sheets
         self.telegram_client = telegram_client
         self.config = config
+        self.assortment_handler = assortment_handler
         self.notifications = None  # Будет инициализирован позже
     
     
@@ -55,14 +56,14 @@ class OrderHandler:
             
             # Отправляем сообщение о создании заказа
             await update.message.reply_text("✅ Заказ создан в МС")
-            
+             
             # Записываем заказ в Google Sheets
             await self._write_order_to_sheets(order_data, update)
-            print("✅ ЗЗаказ записан в Google Sheets")
+            print("✅ Заказ записан в Google Sheets")
             await update.message.reply_text("📊 Заказ записан в Google Sheets")
             
             # Создаем кнопки подтверждения
-            message = await self.get_order_message(order_href)
+            message = await self.get_order_message(order_href, order_data.get('overheads'))
             keyboard = [
                 [
                     InlineKeyboardButton("✅ Подтвердить", callback_data="confirm_order"),
@@ -81,7 +82,7 @@ class OrderHandler:
             context.user_data["last_order"] = order
             
         except Exception as e:
-            logger.error(f"❌ Ошибка создания заказа: {e}")
+            
             await update.message.reply_text("❌ Ошибка создания заказа")
     
     async def handle_gastro(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -122,7 +123,9 @@ class OrderHandler:
             
             if action == "confirm_order":
                 order_href = data[1] if len(data) > 1 else None
-                await self._confirm_order(query, context, order_href)
+                order_data = context.user_data.get("last_order_data", {})
+                overheads = order_data.get("overheads", 0)
+                await self._confirm_order(query, context, order_href, overheads, update)
             elif action == "cancel_order":
                 await self._cancel_order(query, context)
             else:
@@ -132,7 +135,7 @@ class OrderHandler:
             logger.error(f"❌ Ошибка обработки callback: {e}")
             await query.edit_message_text("❌ Ошибка обработки")
     
-    async def _confirm_order(self, query, context: ContextTypes.DEFAULT_TYPE, order_href: str):
+    async def _confirm_order(self, query, context: ContextTypes.DEFAULT_TYPE, order_href: str, overheads: int, update):
         """Подтверждение заказа"""
         try:
             # Получаем заказ из контекста
@@ -143,7 +146,7 @@ class OrderHandler:
             
             # Получаем позиции заказа для отображения
             order_href = order.get("meta", {}).get("href")
-            order_message = await self.get_order_message(order_href)
+            order_message = await self.get_order_message(order_href, overheads)
             print("✅ Заказ подтверждён.")
             # Обновляем сообщение с подтверждением и товарами
             await query.edit_message_text(
@@ -163,12 +166,22 @@ class OrderHandler:
             # Отправляем отдельное сообщение об отгрузке
             await query.message.reply_text("📦 Отгрузка создана.")
             print("📦 Отгрузка создана")
+            # Обновляем ассортимент после отгрузки
+            if self.assortment_handler:
+                # Сначала обновляем данные из Мой Склад
+                await self.assortment_handler._prepare_assortment()
+                # Потом обновляем сообщения в форуме
+                await self.assortment_handler._update_assortment(update, context)
+                await query.message.reply_text("🔄 Ассортимент обновлен после отгрузки")
             
             # Меняем статус заказа на "доставлен"
             delivered_state_href = self.config.get('order_states', {}).get('доставлен')
             if delivered_state_href:
                 await self.moy_sklad.change_order_state(order_href, delivered_state_href)
                 print("🔄 Статус заказа изменен на Доставлен")
+                
+        
+            
                  
         except Exception as e:
             logger.error(f"❌ Ошибка подтверждения заказа: {e}")
@@ -186,7 +199,9 @@ class OrderHandler:
             
             # Получаем позиции заказа для отображения
             order_href = order.get("meta", {}).get("href")
-            cancel_message = await self.get_order_message(order_href)
+            order_data = context.user_data.get("last_order_data")
+            overheads = order_data.get("overheads", False)
+            cancel_message = await self.get_order_message(order_href, overheads)
             
             await query.edit_message_text(
                 f"❌ **Отменено**\n\n{cancel_message}",
@@ -197,7 +212,7 @@ class OrderHandler:
             await query.edit_message_text("❌ Ошибка отмены заказа")
     
     
-    async def get_order_message(self, order_href: str) -> str:
+    async def get_order_message(self, order_href: str, overheads: int) -> str:
         """Возвращает готовое сообщение с деталями заказа по order_href"""
         # Получаем заказ из Мой Склад
         order = await self.moy_sklad.get_order_by_href(order_href)
@@ -218,7 +233,7 @@ class OrderHandler:
         order_sum = order.get('sum', 0) / 100000
         delivery_cost = int(order.get('description', 0))
         # Если есть доставка - это накладные расходы
-        overheads = delivery_cost
+    
         
         # Формируем сообщение
         message = f"Клиент: {client_name}\n"
@@ -238,7 +253,7 @@ class OrderHandler:
     async def _write_order_to_sheets(self, order_data: dict, update):
         """Универсальная запись заказа в Google Sheets (Shisha/Gastro)"""
         try:
-            print("🚀 НАЧИНАЮ ЗАПИСЬ В GOOGLE SHEETS")
+            
 
             spreadsheet_id = self.config['spreadsheet_id']  # Одна таблица
             # Определяем тип заказа (Shisha/Gastro) по ОТПРАВИТЕЛЮ
@@ -247,11 +262,11 @@ class OrderHandler:
             if sender_username == self.config['shisha_username']:
                 sheet_type = "Shisha"
                 worksheet_name = self.config['shisha_worksheet_name']  # Из конфига
-                print("✅ ОПРЕДЕЛЕН КАК SHISHA ЗАКАЗ")
+                
             elif sender_username == self.config['gastro_username']:
                 sheet_type = "Gastro"
                 worksheet_name = self.config['gastro_worksheet_name']  # Из конфига
-                print("✅ ОПРЕДЕЛЕН КАК GASTRO ЗАКАЗ")
+                
             else:
                 sheet_type = "Unknown"
                 print(f"⚠️ НЕИЗВЕСТНЫЙ ОТПРАВИТЕЛЬ: {sender_username}")
@@ -269,15 +284,17 @@ class OrderHandler:
             client_link = f'=HYPERLINK("https://t.me/{username}"; "{full_name} @{username}")'
             
             comment = order_data.get('comment', '')
-            delivery = order_data.get('delivery', '')
+            delivery = order_data.get('delivery_cost', '')
             
             # Способ оплаты (как в старом проекте)
             cash = ''
             ivanqr = ''
             transfer = ''
             
-            payment = order_data.get('payment', '').lower()
-            summa = order_data.get('summa', 0)
+            payment = order_data.get('payment_method', '').lower()
+            summa = order_data.get('total', 0)
+            
+            
             
             if 'наличные' in payment:
                 cash = summa
@@ -287,6 +304,7 @@ class OrderHandler:
                 transfer = summa
             else:
                 cash = summa
+            
             
             # Собираем строку для таблицы (как в старом проекте)
             row_data = [date, client_link, comment, delivery, cash, ivanqr, transfer]

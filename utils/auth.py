@@ -11,6 +11,13 @@ load_dotenv()
 api_id = int(os.getenv('TELEGRAM_API_ID'))
 api_hash = os.getenv('TELEGRAM_API_HASH')
 
-client = TelegramClient('botAccount.session', api_id, api_hash)
-client.start()  # тут он спросит номер, код и пароль 2FA
-print(f"Готово, файл botAccount.session создан")
+session_file = 'botAccount.session'
+
+# Проверяем существование файла сессии
+if os.path.exists(session_file):
+    print(f"✅ Файл {session_file} уже существует, ничего не делаем")
+else:
+    print(f"🔧 Файл {session_file} не найден, создаем...")
+    client = TelegramClient(session_file, api_id, api_hash)
+    client.start()  # тут он спросит номер, код и пароль 2FA
+    print(f"✅ Готово, файл {session_file} создан")

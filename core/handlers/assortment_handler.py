@@ -37,7 +37,7 @@ class AssortmentHandler:
             await update.message.reply_text("🔄 Публикую ассортимент, пожалуйста ожидайте...")
             
             # Публикуем ассортимент
-            await self._publish_assortment(final_assortment)
+            await self._publish_assortment(final_assortment, update, context)
             
             await update.message.reply_text("✅ Ассортимент успешно добавлен!")
             
@@ -54,7 +54,7 @@ class AssortmentHandler:
             await self._prepare_assortment()
             
             # Потом обновляем сообщения в форуме
-            await self._update_assortment()
+            await self._update_assortment(update, context)
             
             await update.message.reply_text("✅ Ассортимент успешно обновлен!")
             
@@ -70,8 +70,6 @@ class AssortmentHandler:
             
             # Получаем информацию о канале с описаниями
             entity = await self.telegram_client.get_entity(self.config['flavor_channel'])
-            print(f"🔍 Парсю ветку с описаниями: {entity.title} (Thread ID: {self.config['flavor_thread_id']})")
-            logger.info(f"🔍 Парсю ветку с описаниями: {entity.title} (Thread ID: {self.config['flavor_thread_id']})")
             
             # Получаем все сообщения в ветке с описаниями
             messages = []
@@ -83,8 +81,6 @@ class AssortmentHandler:
                 if message.text:  # Только сообщения с текстом
                     messages.append(message)
             
-            print(f"📋 Найдено {len(messages)} сообщений с описаниями")
-            logger.info(f"📋 Найдено {len(messages)} сообщений с описаниями")
             
             # Создаем структуру для хранения описаний вкусов
             flavor_descriptions = {}
@@ -94,7 +90,7 @@ class AssortmentHandler:
             
             # Идем по массиву актуальных брендов
             for brand in actual_brands:
-                logger.info(f"🔍 Ищу сообщения для бренда: {brand}")
+                
                 
                 # Создаем хештег для поиска (в нижнем регистре, убираем пробелы, апострофы и 's')
                 hashtag = f"#{brand.lower().replace(' ', '').replace(chr(39), '')}"
@@ -106,7 +102,6 @@ class AssortmentHandler:
                         brand_messages.append(message)
                 
                 print(f"📝 Найдено {len(brand_messages)} сообщений для {brand}")
-                logger.info(f"📝 Найдено {len(brand_messages)} сообщений для {brand}")
                 
                 # Обрабатываем найденные сообщения
                 if brand_messages:
@@ -129,12 +124,8 @@ class AssortmentHandler:
                 if brand not in flavor_descriptions:
                     flavor_descriptions[brand] = {}
                     print(f"  ⚠️ Не найдено сообщений для {brand}")
-                    logger.info(f"  ⚠️ Не найдено сообщений для {brand}")
-            
+                    
             # Убираем секцию "Остальные" - нам нужны только бренды из массива
-            
-            print(f"📊 Всего обработано брендов: {len(flavor_descriptions)}")
-            logger.info(f"📊 Всего обработано брендов: {len(flavor_descriptions)}")
             
             # Сохраняем результат в JSON файл
             output_file = self.config['flavor_descriptions_file']
@@ -142,7 +133,6 @@ class AssortmentHandler:
                 json.dump(flavor_descriptions, f, ensure_ascii=False, indent=2)
             
             print(f"✅ Описания вкусов сохранены в {output_file}")
-            logger.info(f"✅ Описания вкусов сохранены в {output_file}")
             
             # Отправляем результат в чат
             total_flavors = sum(len(flavors) for flavors in flavor_descriptions.values())
@@ -197,34 +187,29 @@ class AssortmentHandler:
         """Подготавливает ассортимент - тянет остатки со склада и создает FinalAssortment"""
         try:
             print("🔄 Начинаю подготовку ассортимента...")
-            logger.info("🔄 Начинаю подготовку ассортимента...")
             
             # Получаем остатки со склада
-            print("📦 Получаю остатки со склада...")
+            
             stock_data = await self._get_stock_data()
             if not stock_data:
                 print("❌ Не удалось получить остатки")
                 logger.error("❌ Не удалось получить остатки")
                 return None
             
-            print("✅ Остатки получены успешно")
-            logger.info("✅ Остатки получены успешно")
-            
+        
             # Загружаем словарь название → href
-            print("📚 Загружаю словарь товаров...")
             name_href_file = self.config['item_name_href_file']
             try:
                 with open(name_href_file, "r", encoding="utf-8") as f:
                     name_to_href = json.load(f)
-                print(f"✅ Загружено {len(name_to_href)} товаров из словаря")
+                
             except Exception as e:
                 print(f"❌ Не удалось загрузить ItemNameHref.json: {e}")
-                logger.error(f"❌ Не удалось загрузить ItemNameHref.json: {e}")
+                
                 return None
             
             # Создаем обратный словарь href → название
             href_to_name = {href: name for name, href in name_to_href.items()}
-            logger.info(f"📚 Загружено {len(href_to_name)} товаров из словаря")
             
             # Загружаем описания вкусов
             flavor_descriptions_file = self.config['flavor_descriptions_file']
@@ -232,7 +217,7 @@ class AssortmentHandler:
             try:
                 with open(flavor_descriptions_file, "r", encoding="utf-8") as f:
                     flavor_descriptions = json.load(f)
-                logger.info(f"📚 Загружено описаний вкусов для {len(flavor_descriptions)} брендов")
+                
             except Exception as e:
                 logger.warning(f"⚠️ Не удалось загрузить описания вкусов: {e}")
             
@@ -241,7 +226,7 @@ class AssortmentHandler:
             
             # Идем по массиву актуальных брендов
             for brand in self.config['actual_brands']:
-                logger.info(f"🔍 Обрабатываю бренд: {brand}")
+                
                 
                 # Создаем структуру для бренда
                 brand_data = {
@@ -283,9 +268,7 @@ class AssortmentHandler:
                                         }
                                         brand_data["loose_packs"].append(flavor_data)
                                         link_info = f" (ссылка: {flavor_link})" if flavor_link else " (без ссылки)"
-                                        logger.info(f"  📦 Наразвес: {clean_name} - {available}г → {rounded_quantity}г{link_info}")
-                                    else:
-                                        logger.info(f"  📦 Наразвес: {clean_name} - {available}г → не показываем (< 25г)")
+                                        
                                 else:
                                     # Целые пачки
                                     # Создаем объект вкуса для whole_packs
@@ -296,22 +279,20 @@ class AssortmentHandler:
                                     }
                                     brand_data["whole_packs"].append(flavor_data)
                                     link_info = f" (ссылка: {flavor_link})" if flavor_link else " (без ссылки)"
-                                    logger.info(f"  📦 Целая пачка: {clean_name} - {available}{link_info}")
+                                    
                 
                 # Добавляем бренд в финальный ассортимент, если есть товары
                 if brand_data["whole_packs"] or brand_data["loose_packs"]:
                     final_assortment[brand] = brand_data
                     whole_count = len(brand_data["whole_packs"])
                     loose_count = len(brand_data["loose_packs"])
-                    logger.info(f"✅ Бренд {brand}: {whole_count} целых пачек, {loose_count} наразвес")
+                    
             
             # Сохраняем финальный ассортимент
             final_file = self.config['final_assortment_file']
             with open(final_file, "w", encoding="utf-8") as f:
                 json.dump(final_assortment, f, ensure_ascii=False, indent=2)
             
-            logger.info(f"✅ Финальный ассортимент сохранен в {final_file}")
-            logger.info(f"📊 Обработано брендов: {len(final_assortment)}")
             
             return final_assortment
             
@@ -333,7 +314,7 @@ class AssortmentHandler:
                 "filter": f"store={store_href}"
             }
             
-            logger.info(f"🔍 Запрашиваю остатки по складу: {store_href}")
+            
             
             # Делаем асинхронный запрос к API
             async with aiohttp.ClientSession() as session:
@@ -344,14 +325,14 @@ class AssortmentHandler:
                 async with session.get(url, headers=headers, params=params) as response:
                     if response.status == 200:
                         data = await response.json()
-                        logger.info(f"✅ Получено {data['meta']['size']} товаров с остатками")
+                        
                         
                         # Сохраняем сырые данные остатков
                         stock_file = self.config['stock_data_file']
                         with open(stock_file, "w", encoding="utf-8") as f:
                             json.dump(data, f, ensure_ascii=False, indent=2)
                         
-                        logger.info(f"💾 Остатки сохранены в {stock_file}")
+                        
                         return data
                     else:
                         error_text = await response.text()
@@ -467,7 +448,7 @@ class AssortmentHandler:
                     
         return None
     
-    async def _publish_assortment(self, final_assortment):
+    async def _publish_assortment(self, final_assortment, update=None, context=None):
         """Публикация ассортимента в форум"""
         try:
             print(f"📤 Публикую ассортимент: {len(final_assortment)} брендов")
@@ -494,7 +475,16 @@ class AssortmentHandler:
                             message=message,
                             thread_id=self.config['forum_thread_id']
                         )
-                        print(f"✅ Отправлен в форум: {brand_name} ({len(whole_packs) + len(loose_packs)} товаров)")
+                        print(f"✅ Отправлен в форум: {brand_name} (Целых пачек: {len(whole_packs)} Наразвес: {len(loose_packs)} товаров)")
+                        
+                        # Отправляем уведомление в личный чат с ботом
+                        if update and context:
+                            try:
+                                notification_text = f"🔄 Обновлено: {brand_name} - {len(whole_packs) + len(loose_packs)} товаров"
+                                await update.message.reply_text(notification_text)
+                        
+                            except Exception as notification_error:
+                                print(f"⚠️ Ошибка отправки уведомления: {notification_error}")
                         
                         # Создаем ссылку на сообщение
                         entity = await self.telegram_client.get_entity(self.config['forum_chat_id'])
@@ -596,7 +586,7 @@ class AssortmentHandler:
             ):
                 messages.append(message)
             
-            print(f"📋 ВСЕ СООБЩЕНИЯ В ФОРУМЕ ({len(messages)} шт.):")
+            
             for i, message in enumerate(messages):
                 text_preview = message.text[:50] if message.text else "Нет текста"
                 print(f"   {i}: ID {message.id} | Дата: {message.date} | Текст: {text_preview}...")
@@ -612,13 +602,12 @@ class AssortmentHandler:
                 return None
             
             main_message = min(main_messages, key=lambda m: m.date)
-            print(f"📌 Главное сообщение: ID {main_message.id} | Дата: {main_message.date}")
             
             # Удаляем все сообщения кроме главного
             deleted_count = 0
             for message in messages:
                 if message.id == main_message.id:  # Пропускаем главное сообщение
-                    print(f"⏭️ Пропускаем главное сообщение ID {message.id}")
+                    
                     continue
                 
                 try:
@@ -652,7 +641,7 @@ class AssortmentHandler:
                 return
             
             current_text = main_message.text
-            print(f"📝 Текущий текст главного сообщения: {current_text[:100]}...")
+            
             
             # Удаляем все старые гиперссылки
             import re
@@ -660,11 +649,11 @@ class AssortmentHandler:
             
             # Удаляем жирный текст **
             updated_text = re.sub(r'\*\*', '', updated_text)
-            print("🧹 Удален жирный текст **")
+            
             
             # Удаляем все гиперссылки в формате [текст](ссылка)
             updated_text = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', updated_text)
-            print("🧹 Удалены все старые гиперссылки")
+            
             
             # Добавляем новые гиперссылки
             # Сортируем по длине названия (от длинного к короткому)
@@ -698,7 +687,7 @@ class AssortmentHandler:
         except Exception as e:
             print(f"❌ Ошибка обновления главного сообщения: {e}")
     
-    async def _update_assortment(self):
+    async def _update_assortment(self, update=None, context=None):
         """Обновляет содержимое существующих сообщений с ассортиментом (после отгрузки)"""
         try:
             print("🔄 Начинаю обновление ассортимента...")
@@ -741,7 +730,7 @@ class AssortmentHandler:
             # Пропускаем первое сообщение (главное) - оно не изменяется
             brand_messages = messages[1:]  # Сообщения с брендами
             
-            print(f"📝 Будем обновлять {len(brand_messages)} сообщений с брендами")
+            
             
             # Обновляем каждое сообщение с брендом
             for i, (brand_name, brand_data) in enumerate(assortment_data.items()):
@@ -764,9 +753,6 @@ class AssortmentHandler:
                     whole_packs_count = len(whole_packs)
                     loose_packs_count = len(loose_packs)
                     
-                    print(f"📝 ДЕТАЛИ ИЗМЕНЕНИЙ для {brand_name}:")
-                    print(f"   Целые пачки: {whole_packs_count} товаров")
-                    print(f"   Наразвес: {loose_packs_count} товаров")
                     
                     try:
                         # Обновляем сообщение
@@ -778,6 +764,15 @@ class AssortmentHandler:
                         
                         print(f"✅ Обновлено сообщение {i+1}: {brand_name} ({whole_packs_count + loose_packs_count} товаров)")
                         
+                        # Отправляем уведомление о успешном обновлении в личный чат
+                        if update and context:
+                            try:
+                                notification_text = f"🔄 Обновлено: {brand_name} - {whole_packs_count + loose_packs_count} товаров"
+                                await update.message.reply_text(notification_text)
+                                
+                            except Exception as notification_error:
+                                print(f"⚠️ Ошибка отправки уведомления: {notification_error}")
+                        
                         # Задержка между обновлениями
                         import asyncio
                         await asyncio.sleep(5)
@@ -786,10 +781,19 @@ class AssortmentHandler:
                         error_msg = str(e)
                         if "Content of the message was not modified" in error_msg:
                             print(f"ℹ️ Сообщение {i+1}: {brand_name} - без изменений")
+                            
+                            # Отправляем уведомление что табак не изменился в личный чат
+                            if update and context:
+                                try:
+                                    notification_text = f"ℹ️ {brand_name} не изменен."
+                                    await update.message.reply_text(notification_text)
+                                    
+                                except Exception as notification_error:
+                                    print(f"⚠️ Ошибка отправки уведомления: {notification_error}")
                         else:
                             print(f"❌ Ошибка обновления сообщения {i+1}: {e}")
             
-            print("🎉 Обновление ассортимента завершено!")
+            
             
             # Обновляем главное сообщение с гиперссылками
             if messages and len(messages) > 0:

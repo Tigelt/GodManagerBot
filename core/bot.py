@@ -34,7 +34,7 @@ class GodManagerBot:
         
         # Инициализируем обработчики
         self.assortment_handler = AssortmentHandler(self.telegram_client, self.moy_sklad, config)
-        self.order_handler = OrderHandler(self.moy_sklad, self.google_sheets, self.telegram_client, config)
+        self.order_handler = OrderHandler(self.moy_sklad, self.google_sheets, self.telegram_client, config, self.assortment_handler)
         
         # Telegram Bot Application
         self.app = None

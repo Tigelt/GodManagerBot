@@ -42,7 +42,7 @@ class GoogleSheetsService:
             
             # Авторизуемся
             self.gc = gspread.authorize(creds)
-            logger.info("✅ Google Sheets сервис инициализирован")
+            
             
         except Exception as e:
             logger.error(f"❌ Ошибка инициализации Google Sheets: {e}")
@@ -58,7 +58,7 @@ class GoogleSheetsService:
             with open(self.key_file_path, 'wb') as f:
                 f.write(key_data)
             
-            logger.info("✅ Файл ключа Google Sheets создан")
+            
             
         except Exception as e:
             logger.error(f"❌ Ошибка создания файла ключа: {e}")
@@ -67,30 +67,28 @@ class GoogleSheetsService:
     async def write_to_sheet(self, spreadsheet_id: str, worksheet_name: str, data: List[List]) -> bool:
         """Запись данных в таблицу"""
         try:
-            print(f"🔍 Открываю таблицу: {spreadsheet_id}")
-            print(f"🔍 Лист: {worksheet_name}")
-            print(f"🔍 Данные: {data}")
+            
             
             # Открываем таблицу
             spreadsheet = self.gc.open_by_key(spreadsheet_id)
             worksheet = spreadsheet.worksheet(worksheet_name)
             
             # Записываем данные (как в старом проекте - вставляем в строку 4)
-            print(f"🔄 ВЫЗЫВАЮ insert_row с данными: {data[0]}")
+            
             worksheet.insert_row(data[0], index=4, value_input_option="USER_ENTERED")
-            print(f"✅ СТРОКА ВСТАВЛЕНА В ПОЗИЦИЮ 4")
+            
             
             # Проверяем что данные действительно записались
-            print(f"🔍 ПРОВЕРЯЮ КОЛИЧЕСТВО СТРОК ПОСЛЕ ЗАПИСИ...")
+            
             row_count = worksheet.row_count
-            print(f"📊 КОЛИЧЕСТВО СТРОК В ЛИСТЕ: {row_count}")
+            
             
             # Читаем последние строки для проверки
             if row_count > 0:
                 last_rows = worksheet.get(f"A{row_count}:G{row_count}")
-                print(f"📋 ПОСЛЕДНИЕ СТРОКИ: {last_rows}")
             
-            print(f"✅ Данные записаны в {worksheet_name}")
+            
+            
             return True
             
         except Exception as e:
@@ -110,7 +108,7 @@ class GoogleSheetsService:
             else:
                 data = worksheet.get_all_values()
             
-            logger.info(f"✅ Данные прочитаны из {worksheet_name}")
+            
             return data
             
         except Exception as e:
@@ -127,7 +125,7 @@ class GoogleSheetsService:
             # Обновляем ячейку
             worksheet.update(cell, value)
             
-            logger.info(f"✅ Ячейка {cell} обновлена")
+            
             return True
             
         except Exception as e:
@@ -143,7 +141,7 @@ class GoogleSheetsService:
             # Создаем лист
             spreadsheet.add_worksheet(title=worksheet_name, rows=1000, cols=20)
             
-            logger.info(f"✅ Лист {worksheet_name} создан")
+            
             return True
             
         except Exception as e:
@@ -166,7 +164,7 @@ class GoogleSheetsService:
                     'col_count': worksheet.col_count
                 })
             
-            logger.info(f"✅ Получена информация о {len(worksheets)} листах")
+            
             return worksheets
             
         except Exception as e:
@@ -187,7 +185,7 @@ class GoogleSheetsService:
             if 'data_format' in format_data:
                 worksheet.format('A2:Z1000', format_data['data_format'])
             
-            logger.info(f"✅ Лист {worksheet_name} отформатирован")
+            
             return True
             
         except Exception as e:
