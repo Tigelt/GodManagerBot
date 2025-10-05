@@ -31,7 +31,7 @@ asyncio.run(main())
 
 start() {
     echo "🚀 Запуск GodManagerBot..."
-    docker-compose up -d --build
+    docker-compose up --build
 }
 
 rebuild() {
