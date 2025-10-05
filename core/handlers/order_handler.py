@@ -292,7 +292,7 @@ class OrderHandler:
             transfer = ''
             
             payment = order_data.get('payment_method', '').lower()
-            summa = order_data.get('main_sum', 0)
+            summa = order_data.get('manual_sum', 0)
             
             
             
