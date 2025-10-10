@@ -14,6 +14,7 @@ from services.telegram_client import TelegramClientService
 from services.google_sheets import GoogleSheetsService
 from core.handlers.order_handler import OrderHandler
 from core.handlers.assortment_handler import AssortmentHandler
+from core.handlers.schedule_handler import ScheduleHandler
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +36,7 @@ class GodManagerBot:
         # Инициализируем обработчики
         self.assortment_handler = AssortmentHandler(self.telegram_client, self.moy_sklad, config)
         self.order_handler = OrderHandler(self.moy_sklad, self.google_sheets, self.telegram_client, config, self.assortment_handler)
+        self.schedule_handler = None  # Будет инициализирован после создания app
         
         # Telegram Bot Application
         self.app = None
@@ -59,6 +61,15 @@ class GodManagerBot:
             
             # Устанавливаем меню команд
             self._set_commands_menu()
+            
+            # Инициализируем и запускаем планировщик
+            self.schedule_handler = ScheduleHandler(self.app.bot, self.config)
+            asyncio.get_event_loop().run_until_complete(self.schedule_handler.start_scheduler())
+            print("✅ Планировщик запущен")
+            
+            # Запускаем автопубликацию ассортимента
+            asyncio.get_event_loop().run_until_complete(self.assortment_handler.start_auto_publish())
+            print("✅ Автопубликация ассортимента запущена")
             
             # Запускаем бота
             print("🤖 Bot запущен")
@@ -107,7 +118,9 @@ class GodManagerBot:
     
     async def _handle_start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Обработчик команды /start"""
-        await update.message.reply_text("🤖 GodManagerBot v2.0 запущен!")
+        chat_id = update.message.chat_id
+        username = update.message.from_user.username
+        await update.message.reply_text(f"🤖 GodManagerBot v2.0 запущен!\n\n🆔 Твой Chat ID: `{chat_id}`\n👤 Username: @{username}")
     
     async def _handle_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Обработчик текстовых сообщений"""

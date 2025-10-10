@@ -31,6 +31,7 @@ def load_config() -> Dict[str, Any]:
         # Пользователи
         'shisha_username': os.getenv('SHISHA_USERNAME', ''),
         'gastro_username': os.getenv('GASTRO_USERNAME', ''),
+        'admin_chat_id': os.getenv('ADMIN_CHAT_ID', ''),  # Chat ID для личных уведомлений
         
         # Форум
         'forum_chat_id': os.getenv('FORUM_CHAT_ID', ''),

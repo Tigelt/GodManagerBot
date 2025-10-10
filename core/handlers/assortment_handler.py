@@ -7,6 +7,7 @@ import json
 import re
 import logging
 import aiohttp
+from datetime import datetime
 from telegram import Update
 from telegram.ext import ContextTypes
 
@@ -22,6 +23,7 @@ class AssortmentHandler:
         self.telegram_client = telegram_client
         self.moy_sklad = moy_sklad
         self.config = config
+        self.auto_publish_running = False
     
     async def handle_assortment_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Обработка команды /assortment"""
@@ -825,4 +827,68 @@ class AssortmentHandler:
             
         except Exception as e:
             print(f"❌ Критическая ошибка обновления ассортимента: {e}")
-            raise e
+    
+    async def start_auto_publish(self):
+        """Запуск автоматической публикации ассортимента"""
+        if self.auto_publish_running:
+            logger.warning("Автопубликация уже запущена")
+            return
+        
+        self.auto_publish_running = True
+        logger.info("🕐 Автопубликация ассортимента запущена (12:00 UTC+7)")
+        print("🕐 Автопубликация ассортимента запущена (12:00 UTC+7)")
+        
+        # Запускаем фоновую задачу
+        asyncio.create_task(self._auto_publish_loop())
+    
+    async def _auto_publish_loop(self):
+        """Фоновый цикл автопубликации ассортимента"""
+        while self.auto_publish_running:
+            try:
+                # Получаем текущее время в UTC+7 (Дананг)
+                from datetime import timedelta
+                now_utc7 = datetime.utcnow() + timedelta(hours=7)
+                current_time = now_utc7.time()
+                
+                # Проверяем: сейчас 12:00?
+                if current_time.hour == 12 and current_time.minute == 0:
+                    print(f"🕐 [{now_utc7.strftime('%Y-%m-%d %H:%M')}] Автоматическая публикация ассортимента...")
+                    await self._auto_publish_assortment()
+                    # Ждём 60 секунд чтобы не запустить дважды
+                    await asyncio.sleep(60)
+                
+                # Ждём 60 секунд до следующей проверки
+                await asyncio.sleep(60)
+                
+            except Exception as e:
+                logger.error(f"❌ Ошибка в автопубликации: {e}")
+                print(f"❌ Ошибка в автопубликации: {e}")
+                await asyncio.sleep(60)
+    
+    async def _auto_publish_assortment(self):
+        """Автоматическая публикация ассортимента"""
+        try:
+            print("🔄 Подготовка ассортимента...")
+            
+            # Подготавливаем ассортимент
+            final_assortment = await self._prepare_assortment()
+            if not final_assortment:
+                print("❌ Не удалось подготовить ассортимент")
+                return
+            
+            print("🔄 Публикация ассортимента...")
+            
+            # Публикуем ассортимент (без update и context)
+            await self._publish_assortment(final_assortment)
+            
+            print("✅ Ассортимент успешно опубликован автоматически!")
+            
+        except Exception as e:
+            logger.error(f"❌ Ошибка автопубликации ассортимента: {e}")
+            print(f"❌ Ошибка автопубликации ассортимента: {e}")
+    
+    def stop_auto_publish(self):
+        """Остановка автопубликации"""
+        self.auto_publish_running = False
+        logger.info("🛑 Автопубликация остановлена")
+        print("🛑 Автопубликация остановлена")
