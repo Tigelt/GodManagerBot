@@ -50,7 +50,7 @@ def load_config() -> Dict[str, Any]:
         
         # Бренды
         'actual_brands': [
-            'Musthave', 'Darkside', 'Blackburn', 'DS shot', 'Chabacco',
+            'Musthave', 'Darkside', 'Blackburn', 'DS shot', 'Chabacco', 'Nash',
             'Satyr', 'Xperience', 'Trofimoff\'s', 'Overdose', 'Starline', 'Энтузиаст'
         ],
         

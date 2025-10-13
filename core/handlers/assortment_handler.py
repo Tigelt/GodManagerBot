@@ -285,6 +285,9 @@ class AssortmentHandler:
                 
                 # Добавляем бренд в финальный ассортимент, если есть товары
                 if brand_data["whole_packs"] or brand_data["loose_packs"]:
+                    # Сортируем товары внутри бренда по названию
+                    brand_data["whole_packs"].sort(key=lambda x: x["name"])
+                    brand_data["loose_packs"].sort(key=lambda x: x["name"])
                     final_assortment[brand] = brand_data
                     whole_count = len(brand_data["whole_packs"])
                     loose_count = len(brand_data["loose_packs"])
