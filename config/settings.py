@@ -27,15 +27,20 @@ def load_config() -> Dict[str, Any]:
         'spreadsheet_id': os.getenv('SPREADSHEET_ID', ''),
         'shisha_worksheet_name': os.getenv('SHISHA_WORKSHEET_NAME', 'Shisha'),
         'gastro_worksheet_name': os.getenv('GASTRO_WORKSHEET_NAME', 'Gastro'),
+        'gastro_inventory_worksheet_name': os.getenv('GASTRO_INVENTORY_WORKSHEET_NAME', 'ПРОДУКТЫ'),
         
         # Пользователи
         'shisha_username': os.getenv('SHISHA_USERNAME', ''),
         'gastro_username': os.getenv('GASTRO_USERNAME', ''),
         'admin_chat_id': os.getenv('ADMIN_CHAT_ID', ''),  # Chat ID для личных уведомлений
         
-        # Форум
+        # Форум Shisha
         'forum_chat_id': os.getenv('FORUM_CHAT_ID', ''),
         'forum_thread_id': int(os.getenv('FORUM_THREAD_ID', '0')),
+        
+        # Форум Gastro
+        'gastro_forum_chat_id': os.getenv('GASTRO_FORUM_CHAT_ID', ''),
+        'gastro_forum_thread_id': int(os.getenv('GASTRO_FORUM_THREAD_ID', '0')),
         
         # Канал с описаниями вкусов
         'flavor_channel': os.getenv('FLAVOR_CHANNEL', ''),
@@ -47,6 +52,7 @@ def load_config() -> Dict[str, Any]:
         'stock_data_file': 'data/StockData.json',
         'item_name_href_file': 'data/ItemNameHref.json',
         'agent_name_href_file': 'data/AgentNameHref.json',
+        'menu_file': 'data/menu.json',
         
         # Бренды
         'actual_brands': [

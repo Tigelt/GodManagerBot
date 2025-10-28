@@ -88,6 +88,7 @@ class GodManagerBot:
         self.app.add_handler(CommandHandler("updateassortment", self.assortment_handler.handle_update_assortment_command))
         self.app.add_handler(CommandHandler("baseflavor", self.assortment_handler.handle_base_flavor_command))
         self.app.add_handler(CommandHandler("inventory", self.assortment_handler.handle_inventory_command))
+        self.app.add_handler(CommandHandler("publishmenu", self.assortment_handler.handle_publish_menu_command))
         
         # Обработчики сообщений
         self.app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self._handle_message))
@@ -106,7 +107,8 @@ class GodManagerBot:
             BotCommand("assortment", "Публикация ассортимента"),
             BotCommand("updateassortment", "Обновление ассортимента"),
             BotCommand("baseflavor", "Обновление описаний вкусов"),
-            BotCommand("inventory", "Показать инвентарь")
+            BotCommand("inventory", "Показать инвентарь"),
+            BotCommand("publishmenu", "Опубликовать меню (Gastro)")
         ]
         
         # Устанавливаем команды асинхронно

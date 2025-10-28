@@ -99,6 +99,9 @@ class OrderHandler:
             # Для Gastro только записываем в Google Sheets
             await self._write_order_to_sheets(order_data, update)
             
+            # Списываем остатки из другой таблицы
+            await self._deduct_gastro_inventory(order_data, update)
+            
             # Отправляем подтверждение
             await update.message.reply_text(
                 f"✅ Заказ от {order_data.get('username', 'N/A')} записан в Gastro таблицы"
@@ -321,4 +324,111 @@ class OrderHandler:
         except Exception as e:
             print(f"❌ Ошибка записи заказа в Google Sheets: {e}")
             # Не поднимаем исключение, чтобы не сломать основной поток
+    
+    async def _deduct_gastro_inventory(self, order_data: dict, update=None):
+        """Списание остатков из таблицы инвентаря Gastro"""
+        try:
+            print("📦 [GASTRO INVENTORY] Списываю остатки из таблицы...")
+            
+            # Словарь рецептов: название блюда → список ячеек для списания
+            DISH_RECIPES = {
+                "том ям": ["B3", "B4", "B2"],        # Бульон, Креветки, Кальмары
+                "буузы": ["B5"],                      # Бузы
+                "лагман по синьцзянски": ["B7"],              # Бульон, Говядина
+                "окорок копченый": ["B9"],
+                "лазанья": ["B6"] # Окорок копченый
+            }
+            
+            # Получаем список товаров из заказа
+            items = order_data.get('items', [])
+            
+            # Список для отчета
+            deducted_report = []
+            unknown_dishes = []
+            
+            # Идем по каждому товару в заказе
+            for item in items:
+                dish_name = item.get('name', '')
+                quantity = item.get('quantity', 0)
+                
+                print(f"🍽️ Обрабатываю блюдо: {dish_name} x{quantity}")
+                
+                # Получаем ячейки для блюда из словаря
+                if dish_name in DISH_RECIPES:
+                    cells = DISH_RECIPES[dish_name]
+                    result = await self._deduct_ingredients(dish_name, quantity, cells)
+                    if result:
+                        deducted_report.append(f"✅ {dish_name} x{quantity}")
+                else:
+                    print(f"⚠️ Неизвестное блюдо: {dish_name}, пропускаю")
+                    unknown_dishes.append(f"⚠️ {dish_name} x{quantity} (не найдено в рецептах)")
+            
+            # Формируем отчет для Telegram
+            if update and (deducted_report or unknown_dishes):
+                report_text = "📦 Списание ингредиентов:\n\n"
+                
+                if deducted_report:
+                    report_text += "\n".join(deducted_report)
+                
+                if unknown_dishes:
+                    report_text += "\n\n" + "\n".join(unknown_dishes)
+                
+                try:
+                    await update.message.reply_text(report_text)
+                except Exception as e:
+                    print(f"❌ Ошибка отправки отчета в Telegram: {e}")
+            
+            print("✅ [GASTRO INVENTORY] Остатки списаны")
+            
+        except Exception as e:
+            logger.error(f"❌ Ошибка списания остатков Gastro: {e}")
+            print(f"❌ Ошибка списания остатков Gastro: {e}")
+            # Не поднимаем исключение, чтобы не сломать основной поток
+    
+    async def _deduct_ingredients(self, dish_name: str, quantity: int, cells: list):
+        """Универсальная функция списания ингредиентов из ячеек"""
+        try:
+            print(f"🔧 [{dish_name}] Списываю {quantity} из ячеек: {cells}")
+            
+            # Получаем настройки из конфига
+            spreadsheet_id = self.config['spreadsheet_id']
+            worksheet_name = self.config['gastro_inventory_worksheet_name']
+            
+            # Открываем таблицу (используем gspread напрямую)
+            spreadsheet = self.google_sheets.gc.open_by_key(spreadsheet_id)
+            worksheet = spreadsheet.worksheet(worksheet_name)
+            
+            # Для каждой ячейки списываем количество
+            for cell in cells:
+                try:
+                    print(f"   📉 Обрабатываю ячейку {cell}")
+                    
+                    # Читаем текущее значение из ячейки
+                    current_value = worksheet.acell(cell).value
+                    
+                    # Преобразуем в число
+                    current_amount = float(current_value) if current_value else 0
+                    print(f"   📊 Текущее значение в {cell}: {current_amount}")
+                    
+                    # Вычитаем количество
+                    new_amount = current_amount - quantity
+                    if new_amount < 0:
+                        print(f"   ⚠️ Внимание! В {cell} недостаточно ингредиентов ({current_amount}), списываю в минус")
+                    
+                    # Записываем новое значение
+                    worksheet.update(cell, [[new_amount]])
+                    
+                    print(f"   ✅ {cell}: {current_amount} → {new_amount}")
+                    
+                except Exception as e:
+                    print(f"   ❌ Ошибка обработки ячейки {cell}: {e}")
+                    continue
+            
+            print(f"✅ [{dish_name}] Ингредиенты списаны")
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Ошибка списания ингредиентов для {dish_name}: {e}")
+            print(f"❌ Ошибка списания ингредиентов для {dish_name}: {e}")
+            return False
     

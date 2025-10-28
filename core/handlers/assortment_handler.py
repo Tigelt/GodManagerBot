@@ -873,15 +873,18 @@ class AssortmentHandler:
         try:
             print("🔄 Подготовка ассортимента...")
             
-            # Подготавливаем ассортимент
+            # Подготавливаем ассортимент один раз
             final_assortment = await self._prepare_assortment()
             if not final_assortment:
                 print("❌ Не удалось подготовить ассортимент")
                 return
             
-            print("🔄 Публикация ассортимента...")
+            # Публикуем СНАЧАЛА в Gastro форум
+            print("🔄 Публикация в Gastro форум...")
+            await self._publish_to_gastro_forum(final_assortment)
             
-            # Публикуем ассортимент (без update и context)
+            # Потом публикуем в Shisha форум
+            print("🔄 Публикация в Shisha форум...")
             await self._publish_assortment(final_assortment)
             
             print("✅ Ассортимент успешно опубликован автоматически!")
@@ -889,6 +892,125 @@ class AssortmentHandler:
         except Exception as e:
             logger.error(f"❌ Ошибка автопубликации ассортимента: {e}")
             print(f"❌ Ошибка автопубликации ассортимента: {e}")
+    
+    async def _publish_to_gastro_forum(self, final_assortment):
+        """Публикация меню в Gastro форум"""
+        try:
+            print(f"📤 [GASTRO] Публикую меню...")
+            
+            # Используем настройки Gastro форума
+            gastro_chat_id = self.config['gastro_forum_chat_id']
+            gastro_thread_id = self.config['gastro_forum_thread_id']
+            
+            # Загружаем текст меню из JSON
+            menu_file = self.config['menu_file']
+            try:
+                with open(menu_file, 'r', encoding='utf-8') as f:
+                    menu_data = json.load(f)
+                    menu_text = menu_data.get('menu_text', '')
+            except Exception as e:
+                print(f"❌ [GASTRO] Ошибка чтения menu.json: {e}")
+                return
+            
+            # СНАЧАЛА удаляем ВСЕ старые сообщения
+            try:
+                # Получаем все сообщения из ветки
+                messages = []
+                async for message in self.telegram_client.iter_messages(
+                    gastro_chat_id,
+                    reply_to=gastro_thread_id,
+                    limit=100
+                ):
+                    messages.append(message)
+                
+                print(f"🔍 [GASTRO] Найдено {len(messages)} сообщений в ветке")
+                
+                # Удаляем ВСЕ сообщения
+                if messages:
+                    print(f"🗑️ [GASTRO] Удаляю {len(messages)} старых сообщений...")
+                    
+                    for msg in messages:
+                        try:
+                            await self.telegram_client.delete_message(
+                                chat_id=gastro_chat_id,
+                                message_id=msg.id
+                            )
+                            print(f"✅ [GASTRO] Удалено сообщение ID: {msg.id}")
+                        except Exception as del_error:
+                            print(f"⚠️ [GASTRO] Не удалось удалить сообщение {msg.id}: {del_error}")
+                else:
+                    print(f"ℹ️ [GASTRO] Нет сообщений для удаления")
+                
+            except Exception as e:
+                print(f"⚠️ [GASTRO] Ошибка удаления старых сообщений: {e}")
+            
+            # ПОТОМ отправляем новое меню с фотографиями
+            try:
+                # Получаем все фотографии из папки
+                import os
+                import glob
+                photo_dir = 'data/picture'
+                photo_files = glob.glob(os.path.join(photo_dir, '*.jpg')) + glob.glob(os.path.join(photo_dir, '*.png'))
+                
+                print(f"📸 [GASTRO] Найдено {len(photo_files)} фотографий: {photo_files}")
+                
+                # Отправляем фото с меню через Telethon
+                from telethon import TelegramClient
+                client = TelegramClient(self.telegram_client.session_file, self.telegram_client.api_id, self.telegram_client.api_hash)
+                
+                await client.start()
+                entity = await client.get_entity(gastro_chat_id)
+                
+                if photo_files:
+                    # Отправляем альбом фото с подписью
+                    sent_messages = await client.send_file(
+                        entity,
+                        photo_files,
+                        caption=menu_text,
+                        reply_to=gastro_thread_id,
+                        parse_mode='markdown'
+                    )
+                    
+                    # Если отправлено несколько фото, берем ID первого
+                    if isinstance(sent_messages, list):
+                        new_message_id = sent_messages[0].id
+                    else:
+                        new_message_id = sent_messages.id
+                    
+                    print(f"✅ [GASTRO] Новое меню с фото опубликовано (ID: {new_message_id})")
+                else:
+                    # Если фото нет - отправляем только текст
+                    sent_message = await client.send_message(
+                        entity,
+                        menu_text,
+                        reply_to=gastro_thread_id,
+                        parse_mode='markdown'
+                    )
+                    new_message_id = sent_message.id
+                    print(f"✅ [GASTRO] Новое меню опубликовано без фото (ID: {new_message_id})")
+                
+                await client.disconnect()
+                
+            except Exception as send_error:
+                print(f"❌ [GASTRO] Ошибка отправки меню: {send_error}")
+            
+            print("✅ [GASTRO] Публикация завершена")
+            
+        except Exception as e:
+            logger.error(f"❌ [GASTRO] Ошибка публикации: {e}")
+            print(f"❌ [GASTRO] Ошибка публикации: {e}")
+
+    async def handle_publish_menu_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Ручная публикация меню в Gastro форум (/publishmenu)"""
+        try:
+            await update.message.reply_text("📤 Публикую меню в Gastro форум...")
+            # Подготавливаем ассортимент, чтобы структура не была пустой (не используется для меню)
+            final_assortment = await self._prepare_assortment()
+            await self._publish_to_gastro_forum(final_assortment or {})
+            await update.message.reply_text("✅ Меню опубликовано")
+        except Exception as e:
+            logger.error(f"❌ Ошибка ручной публикации меню: {e}")
+            await update.message.reply_text("❌ Ошибка публикации меню")
     
     def stop_auto_publish(self):
         """Остановка автопубликации"""
