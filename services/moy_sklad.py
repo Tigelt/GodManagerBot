@@ -334,15 +334,24 @@ class MoySkladAPI:
             
             # Если не найден, создаем нового (как в старом проекте)
             href = await self._create_agent(agent_name)
+            
+            # Обновляем файл со всеми агентами
+            if href:
+                print(f"🔄 Обновляю список всех агентов...")
+                await self._save_all_agents_to_json(agents_file)
+                print(f"✅ Файл {agents_file} обновлен")
+            
             return href
             
         except Exception as e:
             logger.error(f"❌ Ошибка поиска агента: {e}")
             return None
     
-    def _smart_get(self, agents: dict, search_key: str) -> str:
+    def _smart_get(self, agents: list, search_key: str) -> str:
         """Умный поиск агента по частичному совпадению"""
-        for name, href in agents.items():
+        for agent in agents:
+            name = agent.get("name", "")
+            href = agent.get("href", "")
             if search_key.lower() in name.lower():
                 return href
         return None
@@ -372,7 +381,7 @@ class MoySkladAPI:
     async def _save_all_agents_to_json(self, json_file: str):
         """Сохранение всех агентов в JSON файл"""
         url = f"{self.base_url}entity/counterparty"
-        all_agents = {}
+        all_agents = []
         
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=self.headers) as response:
@@ -382,11 +391,14 @@ class MoySkladAPI:
                         name = agent.get("name")
                         href = agent.get("meta", {}).get("href")
                         if name and href:
-                            all_agents[name] = href
+                            all_agents.append({"name": name, "href": href})
+                    
+                    # Сортируем агентов по имени
+                    sorted_agents = sorted(all_agents, key=lambda x: x["name"])
                     
                     # Сохраняем в JSON
                     with open(json_file, "w", encoding="utf-8") as f:
-                        json.dump(all_agents, f, ensure_ascii=False, indent=2)
+                        json.dump(sorted_agents, f, ensure_ascii=False, indent=2)
                     
                     logger.info(f"💾 Сохранено {len(all_agents)} контрагентов в {json_file}")
 
