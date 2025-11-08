@@ -438,7 +438,7 @@ class AssortmentHandler:
             return 0
         
         # Округляем в меньшую сторону до кратного 25
-        return (quantity // 25) * 25
+        return ((quantity-5) // 25) * 25
     
     def _find_flavor_link(self, brand_name, flavor_name, flavor_descriptions):
         """Ищет ссылку на описание вкуса - ТОЧНОЕ СОВПАДЕНИЕ В НИЖНЕМ РЕГИСТРЕ"""
@@ -871,29 +871,39 @@ class AssortmentHandler:
     async def _auto_publish_assortment(self):
         """Автоматическая публикация ассортимента"""
         try:
-            print("🔄 Подготовка ассортимента...")
-            
-            # Подготавливаем ассортимент один раз
-            final_assortment = await self._prepare_assortment()
-            if not final_assortment:
-                print("❌ Не удалось подготовить ассортимент")
-                return
-            
-            # Публикуем СНАЧАЛА в Gastro форум
-            print("🔄 Публикация в Gastro форум...")
-            await self._publish_to_gastro_forum(final_assortment)
-            
-            # Потом публикуем в Shisha форум
-            print("🔄 Публикация в Shisha форум...")
-            await self._publish_assortment(final_assortment)
-            
-            print("✅ Ассортимент успешно опубликован автоматически!")
+            from datetime import timedelta
+            now_utc7 = datetime.utcnow() + timedelta(hours=7)
+            weekday = now_utc7.weekday()  # Пн=0 ... Вс=6
+            print(f"🗓️ [AUTO] Текущее время (UTC+7): {now_utc7.strftime('%Y-%m-%d %H:%M')}, weekday={weekday}")
+
+            # Публикация меню Gastro (кроме воскресенья)
+            if weekday == 6:
+                print("⏭️ [AUTO] Воскресенье — меню Gastro не публикуем")
+            else:
+                print("🔄 [AUTO] Публикация меню в Gastro форум")
+                await self._publish_to_gastro_forum()
+
+            # Публикация ассортимента Shisha (кроме среды)
+            if weekday == 2:
+                print("⏭️ [AUTO] Среда — ассортимент Shisha не публикуем")
+            else:
+                print("🔄 [AUTO] Подготавливаю ассортимент Shisha...")
+                final_assortment = await self._prepare_assortment()
+                if not final_assortment:
+                    print("❌ [AUTO] Не удалось подготовить ассортимент Shisha")
+                    return
+
+                print("🔄 [AUTO] Публикация ассортимента Shisha...")
+                await self._publish_assortment(final_assortment)
+                print("✅ [AUTO] Ассортимент Shisha опубликован")
+
+            print("✅ [AUTO] Автопубликация завершена")
             
         except Exception as e:
             logger.error(f"❌ Ошибка автопубликации ассортимента: {e}")
             print(f"❌ Ошибка автопубликации ассортимента: {e}")
     
-    async def _publish_to_gastro_forum(self, final_assortment):
+    async def _publish_to_gastro_forum(self):
         """Публикация меню в Gastro форум"""
         try:
             print(f"📤 [GASTRO] Публикую меню...")
@@ -1006,7 +1016,7 @@ class AssortmentHandler:
             await update.message.reply_text("📤 Публикую меню в Gastro форум...")
             # Подготавливаем ассортимент, чтобы структура не была пустой (не используется для меню)
             final_assortment = await self._prepare_assortment()
-            await self._publish_to_gastro_forum(final_assortment or {})
+            await self._publish_to_gastro_forum()
             await update.message.reply_text("✅ Меню опубликовано")
         except Exception as e:
             logger.error(f"❌ Ошибка ручной публикации меню: {e}")
