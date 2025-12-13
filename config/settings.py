@@ -27,7 +27,7 @@ def load_config() -> Dict[str, Any]:
         'spreadsheet_id': os.getenv('SPREADSHEET_ID', ''),
         'shisha_worksheet_name': os.getenv('SHISHA_WORKSHEET_NAME', 'Shisha'),
         'gastro_worksheet_name': os.getenv('GASTRO_WORKSHEET_NAME', 'Gastro'),
-        'gastro_inventory_worksheet_name': os.getenv('GASTRO_INVENTORY_WORKSHEET_NAME', 'ПРОДУКТЫ'),
+        'gastro_inventory_worksheet_name': os.getenv('GASTRO_INVENTORY_WORKSHEET_NAME', 'Снабжение'),
         
         # Пользователи
         'shisha_username': os.getenv('SHISHA_USERNAME', ''),
