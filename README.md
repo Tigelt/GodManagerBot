@@ -45,6 +45,8 @@ GMB2/
 4. Запустите: `python main.py`
 
 ## Docker
+Для запуска через докер нужно использовать короткие команды из файла commands.sh
+./commands.sh rebuild
 
 ```bash
 docker-compose up -d
@@ -60,4 +62,4 @@ docker-compose up -d
 
 ## Лицензия
 
-MIT
+MIT 

@@ -62,11 +62,7 @@ class GodManagerBot:
             # Устанавливаем меню команд
             self._set_commands_menu()
             
-            # Инициализируем и запускаем планировщик
-            self.schedule_handler = ScheduleHandler(self.app.bot, self.config)
-            asyncio.get_event_loop().run_until_complete(self.schedule_handler.start_scheduler())
-            print("✅ Планировщик запущен")
-            
+          
             # Запускаем автопубликацию ассортимента
             asyncio.get_event_loop().run_until_complete(self.assortment_handler.start_auto_publish())
             print("✅ Автопубликация ассортимента запущена")
