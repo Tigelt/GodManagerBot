@@ -14,7 +14,7 @@ from services.telegram_client import TelegramClientService
 from services.google_sheets import GoogleSheetsService
 from core.handlers.order_handler import OrderHandler
 from core.handlers.assortment_handler import AssortmentHandler
-from core.handlers.schedule_handler import ScheduleHandler
+
 
 logger = logging.getLogger(__name__)
 
