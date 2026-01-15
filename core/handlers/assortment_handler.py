@@ -257,16 +257,30 @@ class AssortmentHandler:
                                 # Ищем ссылку на описание вкуса
                                 flavor_link = self._find_flavor_link(brand, clean_name, flavor_descriptions)
                                 
-                                # Только целые пачки: развес (1г) пропускаем
+                                # Проверяем, заканчивается ли на "1г"
                                 if item_name.endswith("1г") or item_name.endswith("(1г)"):
-                                    continue
-                                
-                                flavor_data = {
-                                    "name": clean_name,
-                                    "quantity": available,
-                                    "link": flavor_link
-                                }
-                                brand_data["whole_packs"].append(flavor_data)
+                                    # Наразвес - округляем до кратного 25
+                                    rounded_quantity = self._round_to_nearest_25(available)
+                                    if rounded_quantity >= 25:  # Показываем только если >= 25г
+                                        # Создаем объект вкуса для loose_packs
+                                        flavor_data = {
+                                            "name": clean_name,
+                                            "quantity": rounded_quantity,
+                                            "link": flavor_link
+                                        }
+                                        brand_data["loose_packs"].append(flavor_data)
+                                        link_info = f" (ссылка: {flavor_link})" if flavor_link else " (без ссылки)"
+                                        
+                                else:
+                                    # Целые пачки
+                                    # Создаем объект вкуса для whole_packs
+                                    flavor_data = {
+                                        "name": clean_name,
+                                        "quantity": available,
+                                        "link": flavor_link
+                                    }
+                                    brand_data["whole_packs"].append(flavor_data)
+                                    link_info = f" (ссылка: {flavor_link})" if flavor_link else " (без ссылки)"
                                     
                 
                 # Добавляем бренд в финальный ассортимент, если есть товары
@@ -277,6 +291,7 @@ class AssortmentHandler:
                     final_assortment[brand] = brand_data
                     whole_count = len(brand_data["whole_packs"])
                     loose_count = len(brand_data["loose_packs"])
+                    #print(f"🔄 Бренд: {brand} - целых: {whole_count} - развес: {loose_count}")
                     
             
             # Сохраняем финальный ассортимент
@@ -284,7 +299,7 @@ class AssortmentHandler:
             with open(final_file, "w", encoding="utf-8") as f:
                 json.dump(final_assortment, f, ensure_ascii=False, indent=2)
             
-            
+            #print(f"🔄 Подготовленный ассортимент: {final_assortment}")
             return final_assortment
             
         except Exception as e:
@@ -453,9 +468,9 @@ class AssortmentHandler:
             # Отправляем каждый бренд отдельным сообщением
             for brand_name, brand_data in final_assortment.items():
                 whole_packs = brand_data.get("whole_packs", [])
-                loose_packs = []  # развес скрыт
+                loose_packs = brand_data.get("loose_packs", [])
                 
-                if whole_packs:
+                if whole_packs or loose_packs:
                     # Формируем сообщение для бренда
                     message = self._format_brand_message(brand_name, whole_packs, loose_packs)
                     
@@ -527,6 +542,21 @@ class AssortmentHandler:
                 message += f"{name} {display_quantity}\n"
         
         # Развес скрыт
+        # Добавляем разделитель и вскрытые вкусы, если есть
+        if loose_packs:
+            message += "\n---\n**Вскрытые вкусы:**\n"
+            
+            for flavor in loose_packs:
+                name = flavor.get("name", "")
+                quantity = flavor.get("quantity", 0)
+                link = flavor.get("link")
+                
+                if link:
+                    # Добавляем гиперссылку с количеством грамм
+                    message += f"[{name}]({link}) {quantity}г\n"
+                else:
+                    # Без гиперссылки, обычное название с количеством грамм
+                    message += f"{name} {quantity}г\n"
         
         return message
     
