@@ -50,6 +50,7 @@ def load_config() -> Dict[str, Any]:
         'final_assortment_file': 'data/FinalAssortment.json',
         'flavor_descriptions_file': 'data/FlavorDescriptions.json',
         'stock_data_file': 'data/StockData.json',
+        'stock_data_file2': 'data/StockData2.json',
         'item_name_href_file': 'data/ItemNameHref.json',
         'agent_name_href_file': 'data/AgentNameHref.json',
         'menu_file': 'data/menu.json',
@@ -58,6 +59,12 @@ def load_config() -> Dict[str, Any]:
         'actual_brands': [
             'Musthave', 'Darkside', 'Blackburn', 'DS shot', 'Chabacco', 'Nash',
             'Satyr', 'Xperience', 'Trofimoff\'s', 'Overdose', 'Starline', 'Энтузиаст'
+        ],
+        
+        'actual_brands2': [
+            'Musthave 125г', 'Darkside 100г', 'Darkside 30г', 'Darkside sabotage 30г', 'DS shot 30г', 'Darkside xperience 30г', 
+            'Darkside xperience 120г',  'Blackburn 200г', 'Chabacco 200г', 'Nash 100г', 'Satyr 100г', 
+            'Trofimoff\'s 125г', 'Overdose 200г', 'Starline 25г', 'Энтузиаст 25г'
         ],
         
         # Проекты (способы оплаты)

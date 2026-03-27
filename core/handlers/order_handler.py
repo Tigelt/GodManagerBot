@@ -85,35 +85,7 @@ class OrderHandler:
             
             await update.message.reply_text("❌ Ошибка создания заказа")
     
-    async def handle_gastro(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Обработка заказов для Gastroheaven"""
-        try:
-            # Парсим сообщение
-            order_data = await parse_order_message(update.message.text)
-            
-            # Валидируем данные
-            if not validate_order_data(order_data):
-                await update.message.reply_text("❌ Ошибка в данных заказа")
-                return
-            
-            # Для Gastro только записываем в Google Sheets
-            await self._write_order_to_sheets(order_data, update)
-            
-            # Списываем остатки из другой таблицы
-            await self._deduct_gastro_inventory(order_data, update)
-            
-            # Отправляем подтверждение
-            await update.message.reply_text(
-                f"✅ Заказ от {order_data.get('username', 'N/A')} записан в Gastro таблицы"
-            )
-            
-            # Логируем
-            if self.notifications:
-                self.notifications.log_order_created(order_data)
-            
-        except Exception as e:
-            logger.error(f"❌ Ошибка обработки заказа Gastro: {e}")
-            await update.message.reply_text("❌ Ошибка записи заказа")
+    
     
     async def handle_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Обработка callback кнопок"""
@@ -172,9 +144,9 @@ class OrderHandler:
             # Обновляем ассортимент после отгрузки
             if self.assortment_handler:
                 # Сначала обновляем данные из Мой Склад
-                await self.assortment_handler._prepare_assortment()
+                await self.assortment_handler._prepare_assortment2()
                 # Потом обновляем сообщения в форуме
-                await self.assortment_handler._update_assortment(update, context)
+                await self.assortment_handler._update_assortment2()
                 await query.message.reply_text("🔄 Ассортимент обновлен после отгрузки")
             
             # Меняем статус заказа на "доставлен"
