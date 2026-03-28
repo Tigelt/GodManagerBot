@@ -82,7 +82,6 @@ class GodManagerBot:
         self.app.add_handler(CommandHandler("start", self._handle_start))
         self.app.add_handler(CommandHandler("assortment", self.assortment_handler.handle_assortment_command))
         self.app.add_handler(CommandHandler("updateassortment", self.assortment_handler.handle_update_assortment_command))
-        self.app.add_handler(CommandHandler("baseflavor", self.assortment_handler.handle_base_flavor_command))
         self.app.add_handler(CommandHandler("inventory", self.assortment_handler.handle_inventory_command)) 
         
         # Обработчики сообщений

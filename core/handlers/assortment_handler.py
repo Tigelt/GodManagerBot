@@ -66,94 +66,7 @@ class AssortmentHandler:
             logger.error(f"❌ Ошибка обработки команды /updateassortment: {e}")
             await update.message.reply_text("❌ Ошибка обновления ассортимента")
     
-    async def handle_base_flavor_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Обработка команды /baseflavor - обновляет описания вкусов из Telegram канала"""
-        try:
-            print("🔄 Обновляю описания вкусов...")
-            await update.message.reply_text("🔄 Обновляю описания вкусов...")
-            
-            # Получаем информацию о канале с описаниями
-            entity = await self.telegram_client.get_entity(self.config['flavor_channel'])
-            
-            # Получаем все сообщения в ветке с описаниями
-            messages = []
-            async for message in self.telegram_client.iter_messages(
-                entity, 
-                reply_to=self.config['flavor_thread_id'], 
-                limit=None
-            ):
-                if message.text:  # Только сообщения с текстом
-                    messages.append(message)
-            
-            
-            # Создаем структуру для хранения описаний вкусов
-            flavor_descriptions = {}
-            
-            # Бренды из конфига
-            actual_brands = self.config['actual_brands']
-            
-            # Идем по массиву актуальных брендов
-            for brand in actual_brands:
-                
-                
-                # Создаем хештег для поиска (в нижнем регистре, убираем пробелы, апострофы и 's')
-                hashtag = f"#{brand.lower().replace(' ', '').replace(chr(39), '')}"
-                
-                # Ищем сообщения с этим хештегом
-                brand_messages = []
-                for message in messages:
-                    if message.text and hashtag in message.text.lower():
-                        brand_messages.append(message)
-                
-                print(f"📝 Найдено {len(brand_messages)} сообщений для {brand}")
-                
-                # Обрабатываем найденные сообщения
-                if brand_messages:
-                    flavor_descriptions[brand] = {}
-                    
-                    for message in brand_messages:
-                        # Берем первую строку как название вкуса и убираем звездочки
-                        lines = message.text.strip().split('\n')
-                        if lines:
-                            flavor_name = lines[0].strip().replace('**', '')
-                            
-                            # Создаем ссылку на сообщение
-                            message_link = f"https://t.me/{entity.username}/{message.id}"
-                            
-                            # Добавляем в структуру
-                            flavor_descriptions[brand][flavor_name] = message_link
-                            logger.info(f"  ✅ {flavor_name} → {message_link}")
-                
-                # Если не нашли сообщения для бренда, создаем пустую секцию
-                if brand not in flavor_descriptions:
-                    flavor_descriptions[brand] = {}
-                    print(f"  ⚠️ Не найдено сообщений для {brand}")
-                    
-            # Убираем секцию "Остальные" - нам нужны только бренды из массива
-            
-            # Сохраняем результат в JSON файл
-            output_file = self.config['flavor_descriptions_file']
-            with open(output_file, "w", encoding="utf-8") as f:
-                json.dump(flavor_descriptions, f, ensure_ascii=False, indent=2)
-            
-            print(f"✅ Описания вкусов сохранены в {output_file}")
-            
-            # Отправляем результат в чат
-            total_flavors = sum(len(flavors) for flavors in flavor_descriptions.values())
-            result_message = f"✅ Обновление описаний вкусов завершено!\n\n"
-            result_message += f"📊 Статистика:\n"
-            result_message += f"• Брендов: {len(flavor_descriptions)}\n"
-            result_message += f"• Всего вкусов: {total_flavors}\n\n"
-            
-            for brand, flavors in flavor_descriptions.items():
-                if flavors:
-                    result_message += f"• {brand}: {len(flavors)} вкусов\n"
-            
-            await update.message.reply_text(result_message)
-            
-        except Exception as e:
-            logger.error(f"❌ Ошибка обработки команды /baseflavor: {e}")
-            await update.message.reply_text(f"❌ Ошибка обновления описаний вкусов: {str(e)}")
+    
     
     async def handle_inventory_command3(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Обработка команды /inventory - показывает инвентарь табаков"""
@@ -385,7 +298,7 @@ class AssortmentHandler:
             if link:
                 message += f"[{name}]({link}) {display_quantity}\n"
             else:
-                message += f"{name} {display_quantity}\n"
+                message += f"•{name} {display_quantity}\n"
 
         # Вскрытые
         if loose_packs:
@@ -404,7 +317,7 @@ class AssortmentHandler:
                 if link:
                     message += f"[{name}]({link}) {quantity}г\n"
                 else:
-                    message += f"{name} {quantity}г\n"
+                    message += f"•{name} {quantity}г\n"
 
         return message
     
@@ -467,33 +380,7 @@ class AssortmentHandler:
         
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
     
- 
-    
-   
-    
-    def _find_flavor_link(self, brand_name, flavor_name, flavor_descriptions):
-        """Ищет ссылку на описание вкуса - ТОЧНОЕ СОВПАДЕНИЕ В НИЖНЕМ РЕГИСТРЕ"""
-        if brand_name in flavor_descriptions:
-            brand_flavors = flavor_descriptions[brand_name]
-            
-            # Точное совпадение в нижнем регистре
-            flavor_name_lower = flavor_name.lower()
-            for desc_flavor_name, link in brand_flavors.items():
-                if desc_flavor_name.lower() == flavor_name_lower:
-                    return link
-                    
-        return None
     
     
     def _format_inventory_message(self, brand_name, whole_packs, loose_packs):
