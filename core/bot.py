@@ -64,8 +64,8 @@ class GodManagerBot:
             
           
             # Запускаем автопубликацию ассортимента
-            #asyncio.get_event_loop().run_until_complete(self.assortment_handler.start_auto_publish())
-            #print("✅ Автопубликация ассортимента запущена")
+            asyncio.get_event_loop().run_until_complete(self.assortment_handler.start_auto_publish())
+            print("✅ Автопубликация ассортимента запущена")
             
             # Запускаем бота
             print("🤖 Bot запущен")

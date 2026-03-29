@@ -122,7 +122,7 @@ class AssortmentHandler:
                 if not whole_packs and not loose_packs:
                     continue
 
-                message = self._format_brand_message2(
+                message = self._format_inventory_message(
                     brand_name,
                     whole_packs,
                     loose_packs
@@ -386,13 +386,13 @@ class AssortmentHandler:
     def _format_inventory_message(self, brand_name, whole_packs, loose_packs):
         """Форматирование сообщения для инвентаря - только целые пачки"""
         # Заголовок с квадратиками по бокам и жирным названием бренда заглавными буквами
-        message = f"▪️▪️▪️{brand_name.upper()}▪️▪️▪️\n\n"
+        message = f"▪️{brand_name.upper()}▪️\n\n"
         
         # Показываем только целые пачки
         total_quantity = 0
         for flavor in whole_packs:
             name = flavor.get("name", "")
-            quantity = flavor.get("quantity", 0)
+            quantity = int(flavor.get("stock", 0))
             total_quantity += quantity
             
             # Показываем точное количество
@@ -621,6 +621,7 @@ class AssortmentHandler:
                 # Проверяем: сейчас 12:00?
                 if current_time.hour == 12 and current_time.minute == 0:
                     print(f"🕐 [{now_utc7.strftime('%Y-%m-%d %H:%M')}] Автоматическая публикация ассортимента...")
+                    
                     await self._auto_publish_assortment()
                     # Ждём 60 секунд чтобы не запустить дважды
                     await asyncio.sleep(60)
@@ -637,30 +638,22 @@ class AssortmentHandler:
         """Автоматическая публикация ассортимента"""
         try:
             from datetime import timedelta
-            now_utc7 = datetime.utcnow() + timedelta(hours=7)
-            weekday = now_utc7.weekday()  # Пн=0 ... Вс=6
-            print(f"🗓️ [AUTO] Текущее время (UTC+7): {now_utc7.strftime('%Y-%m-%d %H:%M')}, weekday={weekday}")
+           
+            
 
-            # Публикация меню Gastro (кроме воскресенья)
-            if weekday == 6:
-                print("⏭️ [AUTO] Воскресенье — меню Gastro не публикуем")
-            else:
-                print("🔄 [AUTO] Публикация меню в Gastro форум")
-                await self._publish_to_gastro_forum()
+            # Подготавливаем ассортимент
+            final_assortment = await self._prepare_assortment2()
+            if not final_assortment:
+                
+                return
+            
+            
+            # Публикуем ассортимент
+            #await self._publish_assortment(final_assortment, update, context)
+            await self._publish_assortment2(None, None)
+            
 
-            # Публикация ассортимента Shisha (кроме среды)
-            if weekday == 2:
-                print("⏭️ [AUTO] Среда — ассортимент Shisha не публикуем")
-            else:
-                print("🔄 [AUTO] Подготавливаю ассортимент Shisha...")
-                final_assortment = await self._prepare_assortment()
-                if not final_assortment:
-                    print("❌ [AUTO] Не удалось подготовить ассортимент Shisha")
-                    return
-
-                print("🔄 [AUTO] Публикация ассортимента Shisha...")
-                await self._publish_assortment(final_assortment)
-                print("✅ [AUTO] Ассортимент Shisha опубликован")
+                
 
             print("✅ [AUTO] Автопубликация завершена")
             
