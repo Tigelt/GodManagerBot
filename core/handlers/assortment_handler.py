@@ -308,7 +308,7 @@ class AssortmentHandler:
                 raw_name = flavor.get("name", "")
                 name = self.format_name(raw_name)
                 raw_quantity = flavor.get("stock", 0)
-                quantity = int(raw_quantity // 25 * 25)
+                quantity = int((raw_quantity-5) // 25 * 25)
                 link = flavor.get("link")
 
                 # ФИЛЬТР
