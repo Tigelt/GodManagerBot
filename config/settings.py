@@ -64,7 +64,7 @@ def load_config() -> Dict[str, Any]:
         'actual_brands2': [
             'Musthave 125г', 'Darkside 100г', 'Darkside 30г', 'Darkside sabotage 30г', 'DS shot 30г', 'Darkside xperience 30г', 
             'Darkside xperience 120г',  'Blackburn 200г', 'Chabacco 200г', 'Nash 100г', 'Satyr 100г', 
-            'Trofimoff\'s 125г', 'Overdose 200г', 'Starline 25г', 'Энтузиаст 25г'
+            'Trofimoff\'s 125г', 'Overdose 200г', 'Starline 25г', 'Энтузиаст 25г', 'Brusko 250г', 'Duft 100г'
         ],
         
         # Проекты (способы оплаты)

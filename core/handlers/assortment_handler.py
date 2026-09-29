@@ -101,11 +101,37 @@ class AssortmentHandler:
             logger.error(f"❌ Ошибка обработки команды /inventory: {e}")
             await update.message.reply_text("❌ Ошибка загрузки инвентаря")
             
-            
-            
     async def handle_inventory_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             await update.message.reply_text("🔄 Загружаю инвентарь...")
+
+        # Печатаем названия и HREF из МойСклад
+            import os
+            import requests
+
+            api = "https://api.moysklad.ru/api/remap/1.2"
+            headers = {
+                "Authorization": f"Bearer {os.environ['MOY_SKLAD_TOKEN']}",
+            }
+
+            for label, path in [
+                ("ОРГАНИЗАЦИИ", "/entity/organization"),
+                ("СКЛАДЫ", "/entity/store"),
+                ("ПРОЕКТЫ", "/entity/project"),
+                ("СТАТУСЫ ЗАКАЗОВ", "/entity/customerorder/metadata"),
+            ]:
+                response = requests.get(api + path, headers=headers, timeout=30)
+                response.raise_for_status()
+                data = response.json()
+
+                print(f"\n--- {label} ---", flush=True)
+
+                items = data.get("rows", data.get("states", []))
+                for item in items:
+                    print(
+                        f"{item.get('name')} — {item.get('meta', {}).get('href')}",
+                        flush=True,
+                    )
 
             # 1. Обновляем файл
             await self._prepare_assortment2()
@@ -135,13 +161,7 @@ class AssortmentHandler:
 
         except Exception as e:
             logger.error(f"❌ Ошибка: {e}")
-            await update.message.reply_text("❌ Ошибка загрузки инвентаря")
-            
-            
-            
-            
-            
-            
+            await update.message.reply_text("❌ Ошибка загрузки инвентаря")     
             
             
             
@@ -347,13 +367,15 @@ class AssortmentHandler:
 
                     try:
                         sent_message = await self.telegram_client.send_message(
-                            chat_id=self.config['forum_chat_id'],
+                            chat_id=int(self.config['forum_chat_id']),
                             message=message,
                             thread_id=self.config['forum_thread_id']
                         )
 
-                        entity = await self.telegram_client.get_entity(self.config['forum_chat_id'])
-                        chat_id_numeric = entity.id
+                        #entity = await self.telegram_client.get_entity(self.config['forum_chat_id'])
+                        #chat_id_numeric = entity.id
+                        chat_id_numeric = int(self.config['forum_chat_id'])
+                        #print(f"fdfdfdgfdfg.  {chat_id_numeric}")
                         message_link = f"https://t.me/c/{chat_id_numeric}/{sent_message.id}"
                         brand_links[brand_name] = message_link
 
@@ -410,7 +432,7 @@ class AssortmentHandler:
             # Получаем все сообщения в форуме
             messages = []
             async for message in self.telegram_client.iter_messages(
-                self.config['forum_chat_id'], 
+                int(self.config['forum_chat_id']), 
                 reply_to=self.config['forum_thread_id'], 
                 limit=None
             ):
@@ -442,7 +464,7 @@ class AssortmentHandler:
                 
                 try:
                     await self.telegram_client.delete_message(
-                        chat_id=self.config['forum_chat_id'],
+                        chat_id=int(self.config['forum_chat_id']),
                         message_id=message.id
                     )
                     deleted_count += 1
@@ -462,7 +484,7 @@ class AssortmentHandler:
         try:
             # Получаем главное сообщение
             main_message = await self.telegram_client.get_message(
-                chat_id=self.config['forum_chat_id'],
+                chat_id=int(self.config['forum_chat_id']),
                 message_id=main_message_id
             )
             
@@ -508,7 +530,7 @@ class AssortmentHandler:
             
             # Отправляем обновленное сообщение
             await self.telegram_client.edit_message(
-                chat_id=self.config['forum_chat_id'],
+                chat_id=int(self.config['forum_chat_id']),
                 message_id=main_message_id,
                 text=updated_text
             )
@@ -533,7 +555,7 @@ class AssortmentHandler:
             # 2. Получаем сообщения из форума
             messages = []
             async for message in self.telegram_client.iter_messages(
-                self.config['forum_chat_id'],
+                int(self.config['forum_chat_id']),
                 reply_to=self.config['forum_thread_id'],
                 limit=None
             ):
@@ -568,7 +590,7 @@ class AssortmentHandler:
 
                 try:
                     await self.telegram_client.edit_message(
-                        chat_id=self.config['forum_chat_id'],
+                        chat_id=int(self.config['forum_chat_id']),
                         message_id=message_to_update.id,
                         text=new_text
                     )
