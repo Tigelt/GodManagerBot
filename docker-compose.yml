@@ -1,15 +1,79 @@
-version: '3.8'
-
 services:
   godmanagerbot:
+    image: godmanagerbot:${IMAGE_TAG:-latest}
     build: .
     container_name: godmanagerbot2
-    restart: "no"
-    env_file:
-      - .env
+    restart: unless-stopped
+    init: true
+    secrets:
+      - app_env
+      - bot_account_session
     volumes:
-      - ./data:/app/data:rw
-      - .:/app:rw
+      - ${DATA_DIR_HOST:-./data}:/app/data:rw
+      - main_session_state:/var/lib/godmanager-session
     environment:
-      - PYTHONPATH=/app
-    command: python -u main.py
+      PYTHONPATH: /app
+      SESSION_FILE: /var/lib/godmanager-session/botAccount.session
+    command:
+      - python
+      - -u
+      - docker/secure_entrypoint.py
+      - --env-secret
+      - /run/secrets/app_env
+      - --session-secret
+      - /run/secrets/bot_account_session
+      - --session-target
+      - /var/lib/godmanager-session/botAccount.session
+      - --
+      - python
+      - -u
+      - main.py
+
+  chatmonitor:
+    image: godmanagerbot:${IMAGE_TAG:-latest}
+    container_name: godmanagerbot-monitor
+    restart: unless-stopped
+    init: true
+    secrets:
+      - app_env
+      - monitor_account_session
+      - monitor_chats
+      - monitor_keywords
+    volumes:
+      - monitor_session_state:/var/lib/godmanager-monitor
+    environment:
+      PYTHONPATH: /app
+      MONITOR_CHATS_FILE: /run/secrets/monitor_chats
+      MONITOR_KEYWORDS_FILE: /run/secrets/monitor_keywords
+      SESSION_FILE: /var/lib/godmanager-monitor/monitorAccount.session
+      MONITOR_SESSION_FILE: /var/lib/godmanager-monitor/monitorAccount.session
+    command:
+      - python
+      - -u
+      - docker/secure_entrypoint.py
+      - --env-secret
+      - /run/secrets/app_env
+      - --session-secret
+      - /run/secrets/monitor_account_session
+      - --session-target
+      - /var/lib/godmanager-monitor/monitorAccount.session
+      - --
+      - python
+      - -u
+      - chat_monitor.py
+
+secrets:
+  app_env:
+    file: ${APP_ENV_FILE:-.env}
+  bot_account_session:
+    file: ${BOT_ACCOUNT_SESSION_FILE:-botAccount.session}
+  monitor_account_session:
+    file: ${MONITOR_ACCOUNT_SESSION_FILE:-monitorAccount.session}
+  monitor_chats:
+    file: ${MONITOR_CHATS_FILE_HOST:-config/monitor_chats.txt}
+  monitor_keywords:
+    file: ${MONITOR_KEYWORDS_FILE_HOST:-config/keywords.txt}
+
+volumes:
+  main_session_state:
+  monitor_session_state:

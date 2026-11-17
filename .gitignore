@@ -35,8 +35,16 @@ venv.bak/
 .env.test.local
 .env.production.local
 
+# Private runtime configuration
+config/monitor_chats.txt
+config/keywords.txt
+deploy.env
+
 # Session files
 *.session
+*.session-journal
+*.session-wal
+*.session-shm
 botAccount.session
 aimanager.session
 

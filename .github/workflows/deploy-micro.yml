@@ -1,0 +1,62 @@
+name: Deploy to micro
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-micro
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Configure SSH
+        env:
+          MICRO_HOST: ${{ secrets.MICRO_HOST }}
+          MICRO_PORT: ${{ secrets.MICRO_PORT }}
+          MICRO_SSH_PRIVATE_KEY: ${{ secrets.MICRO_SSH_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$MICRO_SSH_PRIVATE_KEY" > ~/.ssh/micro_deploy
+          chmod 600 ~/.ssh/micro_deploy
+          ssh-keyscan -p "$MICRO_PORT" -H "$MICRO_HOST" >> ~/.ssh/known_hosts
+
+      - name: Deploy exact commit
+        env:
+          MICRO_HOST: ${{ secrets.MICRO_HOST }}
+          MICRO_PORT: ${{ secrets.MICRO_PORT }}
+          MICRO_USER: ${{ secrets.MICRO_USER }}
+          DEPLOY_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          ssh -i ~/.ssh/micro_deploy -p "$MICRO_PORT" "$MICRO_USER@$MICRO_HOST" \
+            "DEPLOY_SHA='$DEPLOY_SHA' bash -s" <<'REMOTE'
+          set -euo pipefail
+          APP_DIR=/opt/godmanagerbot/app
+          SECRETS_DIR=/opt/godmanagerbot/secrets
+
+          test -r "$SECRETS_DIR/deploy.env"
+          test -r "$SECRETS_DIR/app.env"
+          test -r "$SECRETS_DIR/botAccount.session"
+          test -r "$SECRETS_DIR/monitorAccount.session"
+          test -r "$SECRETS_DIR/monitor_chats.txt"
+          test -r "$SECRETS_DIR/keywords.txt"
+
+          if [ ! -d "$APP_DIR/.git" ]; then
+            git clone https://github.com/Tigelt/GodManagerBot.git "$APP_DIR"
+          fi
+          cd "$APP_DIR"
+          git fetch --prune origin
+          git checkout --detach --force "$DEPLOY_SHA"
+          docker compose --env-file "$SECRETS_DIR/deploy.env" up -d --build --remove-orphans
+          docker compose --env-file "$SECRETS_DIR/deploy.env" ps
+          docker image prune -f
+          REMOTE

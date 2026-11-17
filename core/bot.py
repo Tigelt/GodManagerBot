@@ -53,7 +53,7 @@ class GodManagerBot:
             print("✅ Google Sheets инициализирован")
             
             # Создаем Telegram Bot Application
-            print(f"🔍 Bot token: {self.config['bot_token'][:10]}...")  # Показываем первые 10 символов
+            print("🔍 Bot token загружен из Docker secret")
             self.app = ApplicationBuilder().token(self.config['bot_token']).build()
             
             # Регистрируем обработчики команд

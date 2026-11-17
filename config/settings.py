@@ -15,7 +15,7 @@ def load_config() -> Dict[str, Any]:
         # Telegram API (для Telethon)
         'telegram_api_id': int(os.getenv('TELEGRAM_API_ID', '0')),
         'telegram_api_hash': os.getenv('TELEGRAM_API_HASH', ''),
-        'session_file': 'botAccount.session',
+        'session_file': os.getenv('SESSION_FILE', 'botAccount.session'),
         
         # Мой Склад
         'moy_sklad_token': os.getenv('MOY_SKLAD_TOKEN', ''),
