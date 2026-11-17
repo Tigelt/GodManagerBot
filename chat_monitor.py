@@ -362,7 +362,6 @@ class ChatMonitor:
             f"🔎 Найдено: {', '.join(matches)}",
             f"Чат: {chat_label}",
             f"Автор: {sender_label}",
-            f"Дата: {date}",
         ]
         if message_link:
             lines.append(f"Оригинал: {message_link}")
