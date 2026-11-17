@@ -248,6 +248,7 @@ class AssortmentHandler:
         
     async def _get_stock_data2(self):
         """Получает актуальный ассортимент асинхронно"""
+        print("🔄 Получаю ассортимент...get stoc data 2")
         try:
             logger.info("🔄 Получаю ассортимент...")
 
@@ -372,12 +373,20 @@ class AssortmentHandler:
                             thread_id=self.config['forum_thread_id']
                         )
 
-                        #entity = await self.telegram_client.get_entity(self.config['forum_chat_id'])
-                        #chat_id_numeric = entity.id
-                        chat_id_numeric = int(self.config['forum_chat_id'])
-                        #print(f"fdfdfdgfdfg.  {chat_id_numeric}")
-                        message_link = f"https://t.me/c/{chat_id_numeric}/{sent_message.id}"
+                      
+                        
+                        chat_id_numeric = int(self.config["forum_chat_id"])
+
+                        # Убираем префикс -100 для ссылки t.me/c/
+                        channel_id = str(chat_id_numeric).removeprefix("-100")
+
+                        message_link = f"https://t.me/c/{channel_id}/{sent_message.id}"
                         brand_links[brand_name] = message_link
+                        
+                        
+                        
+                        
+                        
 
                         import asyncio
                         await asyncio.sleep(4)
@@ -427,41 +436,54 @@ class AssortmentHandler:
         return message
     
     async def _clear_forum_except_oldest(self):
-        """Очищает форум, оставляя только самое старое сообщение"""
+  #"""Очищает форум, оставляя главное сообщение и 8 следующих фотографий"""
         try:
-            # Получаем все сообщения в форуме
+        # Получаем все сообщения в форуме
             messages = []
             async for message in self.telegram_client.iter_messages(
-                int(self.config['forum_chat_id']), 
-                reply_to=self.config['forum_thread_id'], 
+                int(self.config['forum_chat_id']),
+                reply_to=self.config['forum_thread_id'],
                 limit=None
             ):
                 messages.append(message)
-            
-            
+
+        # Сортируем от старых к новым
+            messages.sort(key=lambda m: m.date)
+
             for i, message in enumerate(messages):
                 text_preview = message.text[:50] if message.text else "Нет текста"
                 print(f"   {i}: ID {message.id} | Дата: {message.date} | Текст: {text_preview}...")
-            
+
             if len(messages) <= 1:
                 print("✅ В форуме только одно сообщение, очистка не нужна")
                 return None
-            
-            # Находим главное сообщение (с текстом, самое старое)
+
+        # Находим главное сообщение (самое старое текстовое)
             main_messages = [m for m in messages if m.text and len(m.text) > 10]
+
             if not main_messages:
                 print("❌ Не найдено главное сообщение с текстом!")
                 return None
-            
+
             main_message = min(main_messages, key=lambda m: m.date)
-            
-            # Удаляем все сообщения кроме главного
+
+        # Сохраняем главное сообщение и следующие 8 сообщений
+            main_index = messages.index(main_message)
+
+            preserved_messages = messages[main_index:main_index + 8]
+            preserved_ids = {m.id for m in preserved_messages}
+
+            print(f"🛡️ Сохраняем {len(preserved_ids)} сообщений:")
+            for message in preserved_messages:
+                print(f"   ID {message.id}")
+
+        # Удаляем остальные сообщения
             deleted_count = 0
+
             for message in messages:
-                if message.id == main_message.id:  # Пропускаем главное сообщение
-                    
+                if message.id in preserved_ids:
                     continue
-                
+
                 try:
                     await self.telegram_client.delete_message(
                         chat_id=int(self.config['forum_chat_id']),
@@ -469,73 +491,81 @@ class AssortmentHandler:
                     )
                     deleted_count += 1
                     print(f"🗑️ Удалено сообщение ID {message.id}")
+
                 except Exception as e:
                     print(f"❌ Не удалось удалить сообщение ID {message.id}: {e}")
-            
-            print(f"✅ Очистка завершена! Удалено {deleted_count} сообщений")
+
+            print(f"✅ Очистка завершена! Удалено {deleted_count}, сохранено {len(preserved_ids)} сообщений")
+
             return main_message.id
-            
+
         except Exception as e:
             print(f"❌ Ошибка очистки форума: {e}")
             return None
     
     async def _update_main_message_with_links(self, main_message_id, brand_links):
-        """Обновляет главное сообщение, добавляя гиперссылки к названиям брендов"""
+        """Обновляет главное сообщение, добавляя корректные гиперссылки к брендам"""
         try:
-            # Получаем главное сообщение
+            import re
+
             main_message = await self.telegram_client.get_message(
                 chat_id=int(self.config['forum_chat_id']),
                 message_id=main_message_id
             )
-            
+
             if not main_message:
                 print(f"❌ Не удалось получить главное сообщение ID {main_message_id}")
                 return
-            
-            current_text = main_message.text
-            
-            
-            # Удаляем все старые гиперссылки
-            import re
-            updated_text = current_text
-            
-            # Удаляем жирный текст **
-            updated_text = re.sub(r'\*\*', '', updated_text)
-            
-            
-            # Удаляем все гиперссылки в формате [текст](ссылка)
-            updated_text = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', updated_text)
-            
-            
-            # Добавляем новые гиперссылки
-            # Сортируем по длине названия (от длинного к короткому)
-            sorted_brands = sorted(brand_links.items(), key=lambda x: len(x[0]), reverse=True)
-            
-            for brand_name, link in sorted_brands:
-                # Создаем гиперссылку в формате Markdown
-                hyperlink = f"[{brand_name}]({link})"
-                
-                # Заменяем в тексте
-                if brand_name in updated_text:
-                    updated_text = updated_text.replace(brand_name, hyperlink)
-                    print(f"🔗 Заменено '{brand_name}' на гиперссылку")
-                else:
-                    print(f"⚠️ Не найдено '{brand_name}' в тексте")
-            
-            # Восстанавливаем жирный текст в начале и конце
-            if not updated_text.startswith('**'):
-                updated_text = '**' + updated_text
-            if not updated_text.endswith('**'):
-                updated_text = updated_text + '**'
-            
-            # Отправляем обновленное сообщение
+
+            current_text = main_message.text or ""
+
+        # Убираем старые гиперссылки, оставляя текст
+            updated_text = re.sub(
+                r'\[([^\]]+)\]\([^)]+\)',
+                r'\1',
+                current_text
+            )
+
+        # Убираем старое форматирование жирным
+            updated_text = updated_text.replace("**", "")
+
+        # Сортируем бренды от длинных названий к коротким
+            sorted_brands = sorted(
+                brand_links.items(),
+                key=lambda x: len(x[0]),
+                reverse=True
+            )
+
+        # Создаём единый шаблон для всех брендов
+            pattern = re.compile(
+                "|".join(re.escape(name) for name, link in sorted_brands),
+                re.IGNORECASE
+            )
+
+        # Словарь для быстрого получения ссылки
+            links = {name.lower(): link for name, link in sorted_brands}
+
+        # Заменяем названия одним проходом
+            def replace_brand(match):
+                brand_name = match.group(0)
+                link = links[brand_name.lower()]
+
+                print(f"🔗 Добавлена ссылка: {brand_name}")
+
+                return f"[{brand_name}]({link})"
+
+            updated_text = pattern.sub(replace_brand, updated_text)
+            updated_text = '**' + updated_text.strip() + '**'
+
+        # Отправляем обновлённое сообщение
             await self.telegram_client.edit_message(
                 chat_id=int(self.config['forum_chat_id']),
                 message_id=main_message_id,
                 text=updated_text
             )
-            print(f"✅ Главное сообщение обновлено с гиперссылками!")
-            
+
+            print("✅ Главное сообщение обновлено с гиперссылками!")
+
         except Exception as e:
             print(f"❌ Ошибка обновления главного сообщения: {e}")
     
